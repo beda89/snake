@@ -18,6 +18,9 @@ namespace WindowsGame1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Snake snake;
+        KeyboardState currentKeyboardState;
+        GamePadState currentGamePadState;
 
         public Game1()
         {
@@ -34,6 +37,7 @@ namespace WindowsGame1
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            snake = new Snake();
 
             base.Initialize();
         }
@@ -47,7 +51,10 @@ namespace WindowsGame1
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            //Load snake texture from Content project
+            Texture2D snakeTexture = Content.Load<Texture2D>("snakeTexture");
+
+            snake.Initialize(snakeTexture, new Vector2(256f, 256f));
         }
 
         /// <summary>
@@ -70,9 +77,46 @@ namespace WindowsGame1
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
+            // Read the current state of the keyboard and gamepad and store it
+            currentKeyboardState = Keyboard.GetState();
+            currentGamePadState = GamePad.GetState(PlayerIndex.One);
+            UpdateSnake(snake);
+
+            snake.Update(gameTime);
 
             base.Update(gameTime);
+        }
+
+        private void UpdateSnake(Snake snake)
+        {
+            Snake.Direction tempDirection;
+            if (currentKeyboardState.IsKeyDown(Keys.Left) ||
+            currentGamePadState.DPad.Left == ButtonState.Pressed)
+            {
+                tempDirection = Snake.Direction.Left;
+            }
+            else if (currentKeyboardState.IsKeyDown(Keys.Right) ||
+            currentGamePadState.DPad.Right == ButtonState.Pressed)
+            {
+                tempDirection = Snake.Direction.Right;
+            }
+            else if (currentKeyboardState.IsKeyDown(Keys.Up) ||
+            currentGamePadState.DPad.Up == ButtonState.Pressed)
+            {
+                tempDirection = Snake.Direction.Up;
+            }
+            else if (currentKeyboardState.IsKeyDown(Keys.Down) ||
+            currentGamePadState.DPad.Down == ButtonState.Pressed)
+            {
+                tempDirection = Snake.Direction.Down;
+            }
+            else
+            {
+                return;
+            }
+            int distance = Math.Abs((int)tempDirection - (int)snake.SnakeDirection);
+            if (distance != 2)
+                snake.SnakeDirection = tempDirection;
         }
 
         /// <summary>
@@ -81,9 +125,14 @@ namespace WindowsGame1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            
+            snake.Draw(spriteBatch);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
