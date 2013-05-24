@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="Exceptions\MessageException.cs" />
     <Compile Include="GameField.cs" />
     <Compile Include="InputField.cs" />
     <Compile Include="IPInputField.cs" />

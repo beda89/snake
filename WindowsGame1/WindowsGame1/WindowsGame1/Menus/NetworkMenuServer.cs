@@ -24,7 +24,7 @@ namespace WindowsGame1.Menus
 
             this.startPosition = startPosition;
 
-            items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, 150, HEIGHT), GameState.NETWORK_MENU_WAITING_FOR_CLIENTS));
+            items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, 150, HEIGHT), GameState.START_SERVER));
             items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), 150, HEIGHT), GameState.MAIN_MENU));
 
             portInput = new InputField("Port:", new Vector2(startPosition.X, 100), base.font, Color.Black,6);
