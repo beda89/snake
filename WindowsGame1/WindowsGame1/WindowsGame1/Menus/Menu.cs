@@ -13,7 +13,7 @@ namespace WindowsGame1.Menus
     {
         private MouseState oldMouseState;
         private MouseState currentMouseState;
-        protected List<MenuEntry> items=new List<MenuEntry>();
+        protected List<MenuEntry> items;//=new List<MenuEntry>();
         protected SpriteFont font;
         private Texture2D snakePic;
         private Rectangle snakePosition;
@@ -27,6 +27,7 @@ namespace WindowsGame1.Menus
             this.snakePosition = new Rectangle(400, 50, snakePic.Width, snakePic.Height);
             this.standardState = standardState;
             this.currentState = standardState;
+            this.items = new List<MenuEntry>();
         }
 
 

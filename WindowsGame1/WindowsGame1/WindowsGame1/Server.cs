@@ -16,12 +16,15 @@ namespace WindowsGame1
         private TcpListener tcpListener;
         private InGameState inGameState = InGameState.STARTING;
         private int snakeNumber = 0;
-   
+
         public Server(int port)
         {
             this.port = port;
             this.tcpListener = new TcpListener(IPAddress.Any, port);
-            currentClients = new List<TcpClient>();
+            this.currentClients = new List<TcpClient>();
+            
+
+
         }
 
         public void start(){
@@ -66,6 +69,7 @@ namespace WindowsGame1
             return currentClients;
         }
 
+
         public void sendStartSignal()
         {
             //player number which gets assigned to every client, starts with 1 because server is 0
@@ -82,23 +86,60 @@ namespace WindowsGame1
         }
 
 
-        public void sendCurrentPositions()
+        private void sendCurrentPosition(TcpClient tcpClient)
         {
+            //send currentPosition
+            StreamWriter writer = new StreamWriter(tcpClient.GetStream());
+            writer.WriteLine("!game start");
+            writer.Flush();
+        }
+
+        public List<Snake> communicateWithClients(List<Snake> snakes)
+        {
+
+            int index = 1;
+
             foreach (TcpClient tcpClient in currentClients)
             {
-                StreamWriter writer = new StreamWriter(tcpClient.GetStream());
-                writer.WriteLine("!game start");
-                writer.Flush();
+                sendCurrentPosition(tcpClient);
+                snakes.ElementAt(index).SnakeDirection=receiveCurrentDirection(tcpClient);
+
+                index++;
             }
 
-            inGameState = InGameState.RUNNING;
+
+            return snakes;
+        }
+
+        private Snake.Direction receiveCurrentDirection(TcpClient tcpClient){
+            StreamReader reader=new StreamReader(tcpClient.GetStream());
+
+            String message = reader.ReadLine();
+
+            String[] splittedMessage= message.Split(' ');
+
+            if (splittedMessage.Length == 3)
+            {
+                if(splittedMessage[1].Equals("Left")){
+                    return Snake.Direction.Left;
+                }else if(splittedMessage[1].Equals("Up")){
+                    return Snake.Direction.Up;
+                }else if(splittedMessage[1].Equals("Right")){
+                    return Snake.Direction.Right;
+                }else if(splittedMessage[1].Equals("Down")){
+                    return Snake.Direction.Down;
+                }
+            }
+
+            //TODO: check if communication fails
+            return Snake.Direction.Down;
 
         }
+
 
         public InGameState getInGameState()
         {
             return inGameState;
         }
-
     }
 }

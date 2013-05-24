@@ -17,6 +17,7 @@ namespace WindowsGame1
         private NetworkStream stream;
         private GameState clientState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
         private InGameState inGameState = InGameState.STARTING;
+        public Snake.Direction clientSnakeDirection {get;set;}
         
         //snakeNumber assigned by server, server is always 0
         private int snakeNumber;
@@ -26,6 +27,9 @@ namespace WindowsGame1
         {
            this.ip = ipString;
            this.port = port;
+
+           //TODO:dummy value
+           clientSnakeDirection = Snake.Direction.Left;
         }
 
         public void start(){
@@ -36,15 +40,20 @@ namespace WindowsGame1
                 stream = tcpClient.GetStream();
 
                 StreamReader reader = new StreamReader(stream);
-                String message= reader.ReadLine();
+                StreamWriter writer = new StreamWriter(stream);
+                String message="";
+                while(!message.StartsWith("!finish")){
+                    message = reader.ReadLine();
 
-                processMessage(message);
+                    if(message!=null){
+                        processMessage(message,writer);
+                    }
+               }
 
             }
             catch (SocketException)
             {
                 clientState = GameState.CONNECTION_REFUSED;
-
             }
         } 
 
@@ -83,9 +92,14 @@ namespace WindowsGame1
         }
 
 
+        private void sendSnakeDirection(StreamWriter writer)
+        {
+            writer.WriteLine("!game "+clientSnakeDirection+" !");
+            writer.Flush();
+        }
 
 
-        private void processMessage(String message)
+        private void processMessage(String message,StreamWriter writer)
         {
             if (message.StartsWith("!start"))
             {
@@ -106,7 +120,7 @@ namespace WindowsGame1
             }
             else if (message.StartsWith("!game"))
             {
-
+                sendSnakeDirection(writer);
 
 
             }

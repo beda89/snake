@@ -226,9 +226,6 @@ namespace WindowsGame1
 
                     if (inGameState == InGameState.STARTING)
                     {
-                        
-
-
                         server.sendStartSignal();
                         
                         //init snakes, first one is needed for server
@@ -248,7 +245,10 @@ namespace WindowsGame1
                         inGameState = InGameState.RUNNING;
                     }
 
-                     UpdateSnakes(snakes,gameTime);
+                    snakes=server.communicateWithClients(snakes);
+
+
+                    UpdateSnakes(snakes,gameTime);
                       
                     break;
 
@@ -308,12 +308,14 @@ namespace WindowsGame1
                 //server snake is always the first one
                 foreach (Snake snake in snakes)
                 {
-                    if (index == client.getSnakeNumber())
-                    {
+                 //   if (index == client.getSnakeNumber())
+                 //   {
                         setDirection(snake);
-                    }
+                        client.clientSnakeDirection = snake.SnakeDirection;
 
-                 //   snake.Update(gameTime);
+                 //   }
+
+                  //  snake.Update(gameTime);
                     index++;
                 }
 
