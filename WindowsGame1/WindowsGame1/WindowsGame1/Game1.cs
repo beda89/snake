@@ -159,7 +159,7 @@ namespace WindowsGame1
                     break;
 
                 case GameState.CONNECT_TO_SERVER:
-                    client = new Client("localhost",20000);
+                    client = new Client("localhost",20000,snakeTexture);
                     clientThread = new System.Threading.Thread(client.start);
                     clientThread.Start();
                     gameState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
@@ -226,23 +226,25 @@ namespace WindowsGame1
 
                     if (inGameState == InGameState.STARTING)
                     {
-                        server.sendStartSignal();
+
                         
                         //init snakes, first one is needed for server
                         snakes = new List<Snake>();
                         Snake snake = new Snake();
-                        snake.Initialize(snakeTexture, new Vector2(256f, 256f));
+                        snake.Initialize(snakeTexture, new Vector2(32f, 32f),Snake.Direction.Right);
                         snakes.Add(snake);
 
 
                         for (int i = 0; i < server.getCurrentClients().Count(); i++)
                         {
                             snake= new Snake();
-                            snake.Initialize(snakeTexture,new Vector2(256f, 256f));
+                            snake.Initialize(snakeTexture, new Vector2(256f, 256f), Snake.Direction.Up);
                             snakes.Add(snake);
                         }
                         
                         inGameState = InGameState.RUNNING;
+
+                        server.sendStartSignal(snakes);
                     }
 
                     snakes=server.communicateWithClients(snakes);
@@ -255,15 +257,10 @@ namespace WindowsGame1
                 case GameState.PLAY_CLIENT:
                     if (client.getClientInGameState() == InGameState.STARTING)
                     {
-                        snakes = new List<Snake>();
-
-                        Snake snake = new Snake();
-                        snake.Initialize(snakeTexture, new Vector2(256f, 256f));
-                        snakes.Add(snake);
-
                         client.setClientInGameState(InGameState.RUNNING);
                     }
 
+                    snakes = client.getSnakes();
 
                     UpdateSnakes(snakes,gameTime);
                     break;
@@ -292,11 +289,11 @@ namespace WindowsGame1
         }
 
 
-        private void UpdateSnakesClient(List<Snake> snakes)
+     /*   private void UpdateSnakesClient(List<Snake> snakes)
         {
 
 
-        }
+        } */
 
 
          private void UpdateSnakes(List<Snake> snakes,GameTime gameTime)
@@ -308,14 +305,14 @@ namespace WindowsGame1
                 //server snake is always the first one
                 foreach (Snake snake in snakes)
                 {
-                 //   if (index == client.getSnakeNumber())
-                 //   {
+                      if (index == client.getSnakeNumber())
+                      {
                         setDirection(snake);
                         client.clientSnakeDirection = snake.SnakeDirection;
 
-                 //   }
+                     }
 
-                  //  snake.Update(gameTime);
+                   // snake.Update(gameTime);
                     index++;
                 }
 
@@ -422,7 +419,7 @@ namespace WindowsGame1
                     networkMenuClient.Draw(spriteBatch);
                     break;
 
-                case GameState.PLAY_CLIENT:
+              /*  case GameState.PLAY_CLIENT:
                     this.IsMouseVisible = false;
                     if (snakes != null)
                     {
@@ -432,12 +429,13 @@ namespace WindowsGame1
                             gameField.Draw(spriteBatch);
                         }
                     }
-                    break;
+                    break; */
 
                 case GameState.NETWORK_MENU_WAITING_FOR_CLIENTS:
                     networkMenuServerWaiting.Draw(spriteBatch);
                     break;
 
+                case GameState.PLAY_CLIENT:
                 case GameState.PLAY_SERVER:
                     this.IsMouseVisible = false;
 
@@ -445,8 +443,9 @@ namespace WindowsGame1
                          foreach (Snake snake in snakes)
                          {
                             snake.Draw(spriteBatch);
-                            gameField.Draw(spriteBatch);
+ 
                          }
+                         gameField.Draw(spriteBatch);
                     }
                     break;
 

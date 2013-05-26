@@ -13,7 +13,7 @@ namespace WindowsGame1
         public Texture2D Texture;
         public enum Direction { Up, Right, Down, Left };
         public List<Direction> parts;
-        public Direction SnakeDirection = Direction.Right;
+        public Direction SnakeDirection;
 
         // The time since we last updated the frame
         private int elapsedTime;
@@ -21,18 +21,21 @@ namespace WindowsGame1
         // The time we display a frame until the next one
         private int frameTime;
 
-        public void Initialize(Texture2D texture, Vector2 position)
+        public void Initialize(Texture2D texture, Vector2 position,Direction SnakeDirection)
         {
             this.Position = position;
             this.Texture = texture;
 
             frameTime = 250;
 
+            this.SnakeDirection = SnakeDirection;
+
             parts = new List<Direction>();
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 1; i++)
             {
-                parts.Add(Direction.Up);
+                parts.Add(SnakeDirection);
             }
+
         }
 
         public void Update(GameTime gameTime)

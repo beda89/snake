@@ -70,15 +70,20 @@ namespace WindowsGame1
         }
 
 
-        public void sendStartSignal()
+        public void sendStartSignal(List<Snake> snakes)
         {
             //player number which gets assigned to every client, starts with 1 because server is 0
             int index=1;
 
+            String positions = buildPositionString(snakes);
+
+
+
             foreach (TcpClient tcpClient in currentClients)
             {
+
                 StreamWriter writer=new StreamWriter(tcpClient.GetStream());
-                writer.WriteLine("!start "+index+" !");
+                writer.WriteLine("!start "+index+ buildPositionString(snakes) +"!");
                 writer.Flush();
             }
 
@@ -86,11 +91,11 @@ namespace WindowsGame1
         }
 
 
-        private void sendCurrentPosition(TcpClient tcpClient)
+        private void sendCurrentPosition(TcpClient tcpClient,List<Snake> snakes)
         {
             //send currentPosition
             StreamWriter writer = new StreamWriter(tcpClient.GetStream());
-            writer.WriteLine("!game start");
+            writer.WriteLine("!game"+buildPositionString(snakes)+"!");
             writer.Flush();
         }
 
@@ -101,7 +106,7 @@ namespace WindowsGame1
 
             foreach (TcpClient tcpClient in currentClients)
             {
-                sendCurrentPosition(tcpClient);
+                sendCurrentPosition(tcpClient,snakes);
                 snakes.ElementAt(index).SnakeDirection=receiveCurrentDirection(tcpClient);
 
                 index++;
@@ -140,6 +145,18 @@ namespace WindowsGame1
         public InGameState getInGameState()
         {
             return inGameState;
+        }
+
+        private String buildPositionString(List<Snake> snakes)
+        {
+            String positions=" ";
+
+            foreach (Snake snake in snakes)
+            {
+                positions +=snake.Position.X + " " + snake.Position.Y+ " ";
+            }
+
+            return positions;
         }
     }
 }
