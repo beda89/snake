@@ -11,13 +11,17 @@ namespace WindowsGame1.Menus
 {
     class Menu
     {
+        protected const int HEIGHT = 30;
+        protected const int WIDTH = 150;
+
+        protected List<MenuEntry> items;
+        protected SpriteFont font;
+        protected GameState standardState;
+
         private MouseState oldMouseState;
         private MouseState currentMouseState;
-        protected List<MenuEntry> items;//=new List<MenuEntry>();
-        protected SpriteFont font;
         private Texture2D snakePic;
         private Rectangle snakePosition;
-        protected GameState standardState;
         private GameState currentState;
 
         public Menu(ContentManager content,GameState standardState)
@@ -30,7 +34,6 @@ namespace WindowsGame1.Menus
             this.items = new List<MenuEntry>();
         }
 
-
         public virtual void Update()
         {
             oldMouseState = currentMouseState;
@@ -39,6 +42,8 @@ namespace WindowsGame1.Menus
 
             foreach (MenuEntry entry in items)
             {
+
+                //checks if menu is clicked
                 if (currentMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (entry.Position.Intersects(mousePosition))
@@ -47,6 +52,8 @@ namespace WindowsGame1.Menus
                     }
                 }
 
+
+                //hover effect
                 if (entry.Position.Intersects(mousePosition))
                 {
                     entry.BackgroundColor = Color.LightGreen;
@@ -70,6 +77,7 @@ namespace WindowsGame1.Menus
 
         public virtual GameState getCurrentState()
         {
+            //currentState is set back to the standardMenu state,if user comes back to this menu
             GameState temp = currentState;
             currentState = standardState;
             return temp;

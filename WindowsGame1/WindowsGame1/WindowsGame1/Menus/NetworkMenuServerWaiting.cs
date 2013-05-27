@@ -11,9 +11,6 @@ namespace WindowsGame1.Menus
 {
     class NetworkMenuServerWaiting:Menu
     {
-        private const int HEIGHT = 30;
-
-        private ContentManager content;
         private Vector2 startPosition;
         private List<String> clientList = new List<String>();
 
@@ -21,8 +18,8 @@ namespace WindowsGame1.Menus
         public NetworkMenuServerWaiting(ContentManager content, Vector2 startPosition) : base(content,GameState.NETWORK_MENU_WAITING_FOR_CLIENTS)
         {
             this.startPosition = startPosition;
-            items.Add(new MenuEntry("Start Game", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, 150, HEIGHT), GameState.PLAY_SERVER));
-            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), 150, HEIGHT), GameState.DISCONNECT_SERVER));
+            items.Add(new MenuEntry("Start Game", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, WIDTH, HEIGHT), GameState.PLAY_SERVER));
+            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), WIDTH, HEIGHT), GameState.DISCONNECT_SERVER));
         }
 
         public void Update(Server server)

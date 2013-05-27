@@ -9,16 +9,12 @@ namespace WindowsGame1.Menus
 {
     class NetworkMenuClientWaiting:Menu
     {
-        private const int HEIGHT = 30;
-
-        private ContentManager content;
         private Vector2 startPosition;
-
 
         public NetworkMenuClientWaiting(ContentManager content, Vector2 startPosition) : base(content,GameState.NETWORK_MENU_WAITING_FOR_SERVER)
         {
             this.startPosition = startPosition;
-            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), 150, HEIGHT), GameState.DISCONNECT_CLIENT));
+            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), WIDTH, HEIGHT), GameState.DISCONNECT_CLIENT));
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)

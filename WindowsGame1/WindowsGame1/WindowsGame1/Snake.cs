@@ -10,9 +10,10 @@ namespace WindowsGame1
     class Snake
     {
         public Vector2 Position;
-        public Texture2D Texture;
+        private Texture2D Texture;
         public enum Direction { Up, Right, Down, Left };
-        public List<Direction> parts;
+
+        public List<Vector2> parts{get;set;}
         public Direction SnakeDirection;
 
         // The time since we last updated the frame
@@ -21,6 +22,7 @@ namespace WindowsGame1
         // The time we display a frame until the next one
         private int frameTime;
 
+        //only called by server
         public void Initialize(Texture2D texture, Vector2 position,Direction SnakeDirection)
         {
             this.Position = position;
@@ -30,15 +32,45 @@ namespace WindowsGame1
 
             this.SnakeDirection = SnakeDirection;
 
-            parts = new List<Direction>();
-            for (int i = 0; i < 1; i++)
+            parts = new List<Vector2>();
+            parts.Add(position);
+
+            Vector2 tempPosition = position;
+
+            for (int i = 0; i < 4; i++)
             {
-                parts.Add(SnakeDirection);
+                switch (SnakeDirection)
+                {
+                    case Direction.Up:
+                        tempPosition.Y-=16;
+                        break;
+                    case Direction.Left:
+                        tempPosition.X += 16;
+                        break;
+                    case Direction.Right:
+                        tempPosition.X-= 16;
+                        break;
+                    case Direction.Down:
+                        tempPosition.Y += 16;
+                        break;
+                }
+
+                parts.Add(tempPosition);
             }
 
         }
 
-        public void Update(GameTime gameTime)
+        //only called by client
+        public void Initialize(Texture2D texture, List<Vector2> parts)
+        {
+            frameTime = 250;
+
+            this.parts = parts;
+            this.Texture = texture;
+        }
+
+        //only called by server
+        public void Update(GameTime gameTime,GameField gameField)
         {
             // Update the elapsed time
             elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -47,53 +79,46 @@ namespace WindowsGame1
             // we need to switch frames
             if (elapsedTime > frameTime)
             {
+                Vector2 tempPosition = Position;
+
                 switch (SnakeDirection)
                 {
                     case Direction.Up:
-                        Position.Y -= 16;
+                        tempPosition.Y -= 16;
                         break;
                     case Direction.Down:
-                        Position.Y += 16;
+                        tempPosition.Y += 16;
                         break;
                     case Direction.Left:
-                        Position.X -= 16;
+                        tempPosition.X -= 16;
                         break;
                     case Direction.Right:
-                        Position.X += 16;
+                        tempPosition.X += 16;
                         break;
                 }
+
+                if (gameField.collides(tempPosition))
+                {
+                    return;
+                }
+
+                Position = tempPosition;
+
                 for (int i = 0; i < parts.Count - 1; i++)
                 {
                     parts[parts.Count - 1 - i] = parts[parts.Count - 2 - i];
                 }
-                parts[0] = SnakeDirection;
+                parts[0] = Position;
                 elapsedTime = 0;
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            Vector2 actualPos = Position;
-            foreach (Direction part in parts)
+            foreach (Vector2 part in parts)
             {
-                spriteBatch.Draw(Texture, actualPos, null, Color.White, 0f,
-                new Vector2(16, 16), 1f, SpriteEffects.None, 0f);
-
-                switch (part)
-                {
-                    case Direction.Up:
-                        actualPos.Y += 16;
-                        break;
-                    case Direction.Down:
-                        actualPos.Y -= 16;
-                        break;
-                    case Direction.Left:
-                        actualPos.X += 16;
-                        break;
-                    case Direction.Right:
-                        actualPos.X -= 16;
-                        break;
-                }
+                spriteBatch.Draw(Texture, part, null, Color.White, 0f,
+                    new Vector2(16, 16) , 1f, SpriteEffects.None, 0f);
             }
         }
     }

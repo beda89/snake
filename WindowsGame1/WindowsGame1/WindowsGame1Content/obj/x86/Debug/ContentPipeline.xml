@@ -2,15 +2,6 @@
 <XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
   <Asset Type="Pipeline:BuildItemCollection">
     <Item>
-      <Source>snakeTexture.png</Source>
-      <Name>snakeTexture</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snakeTexture.xnb</Output>
-      <Time>2013-05-13T09:20:41.6157258+02:00</Time>
-    </Item>
-    <Item>
       <Source>boundsTexture.png</Source>
       <Name>boundsTexture</Name>
       <Importer>TextureImporter</Importer>
@@ -45,6 +36,42 @@
       <Options>None</Options>
       <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snake-cartoon_small.xnb</Output>
       <Time>2013-05-15T01:09:49.3673192+02:00</Time>
+    </Item>
+    <Item>
+      <Source>snakeTexture1.png</Source>
+      <Name>snakeTexture1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snakeTexture1.xnb</Output>
+      <Time>2013-05-13T09:20:41.6157258+02:00</Time>
+    </Item>
+    <Item>
+      <Source>snakeTexture2.png</Source>
+      <Name>snakeTexture2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snakeTexture2.xnb</Output>
+      <Time>2013-05-26T22:37:42.3386412+02:00</Time>
+    </Item>
+    <Item>
+      <Source>snakeTexture3.png</Source>
+      <Name>snakeTexture3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snakeTexture3.xnb</Output>
+      <Time>2013-05-26T22:23:39.6554425+02:00</Time>
+    </Item>
+    <Item>
+      <Source>snakeTexture4.png</Source>
+      <Name>snakeTexture4</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snakeTexture4.xnb</Output>
+      <Time>2013-05-26T22:24:03.842826+02:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

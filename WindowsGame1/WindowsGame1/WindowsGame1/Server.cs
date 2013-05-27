@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace WindowsGame1
@@ -15,23 +16,18 @@ namespace WindowsGame1
         private List<TcpClient> currentClients;
         private TcpListener tcpListener;
         private InGameState inGameState = InGameState.STARTING;
-        private int snakeNumber = 0;
 
         public Server(int port)
         {
             this.port = port;
             this.tcpListener = new TcpListener(IPAddress.Any, port);
             this.currentClients = new List<TcpClient>();
-            
-
-
         }
 
         public void start(){
             tcpListener.Start();
 
-
-            while (true)
+            while (currentClients.Count()<4)
             {
                 try
                 {
@@ -59,8 +55,6 @@ namespace WindowsGame1
             }
 
             currentClients.Clear();
-
-
         }
 
         //TODO: not thread safe
@@ -75,15 +69,13 @@ namespace WindowsGame1
             //player number which gets assigned to every client, starts with 1 because server is 0
             int index=1;
 
-            String positions = buildPositionString(snakes);
-
-
+         //   String positions = buildPositionString(snakes);
 
             foreach (TcpClient tcpClient in currentClients)
             {
 
                 StreamWriter writer=new StreamWriter(tcpClient.GetStream());
-                writer.WriteLine("!start "+index+ buildPositionString(snakes) +"!");
+                writer.WriteLine("!start " + index + buildSnakePositionsString(snakes) + "!");
                 writer.Flush();
             }
 
@@ -95,7 +87,7 @@ namespace WindowsGame1
         {
             //send currentPosition
             StreamWriter writer = new StreamWriter(tcpClient.GetStream());
-            writer.WriteLine("!game"+buildPositionString(snakes)+"!");
+            writer.WriteLine("!game" + buildSnakePositionsString(snakes)+ "!");
             writer.Flush();
         }
 
@@ -111,7 +103,6 @@ namespace WindowsGame1
 
                 index++;
             }
-
 
             return snakes;
         }
@@ -147,16 +138,37 @@ namespace WindowsGame1
             return inGameState;
         }
 
-        private String buildPositionString(List<Snake> snakes)
+        private String buildSnakePositionsString(List<Snake> snakes)
         {
             String positions=" ";
 
             foreach (Snake snake in snakes)
             {
-                positions +=snake.Position.X + " " + snake.Position.Y+ " ";
+                positions += buildPositionString(snake);
+
+                positions += " ";
             }
 
             return positions;
         }
+
+
+        //builds position String for given snake: [posX1 posY1 posX2 posY2 .... ]
+        private String buildPositionString(Snake snake)
+        {
+            String positions = "[";
+
+            foreach (Vector2 part in snake.parts)
+            {
+                positions+=part.X+" "+part.Y+" ";
+            }
+
+            positions=positions.Remove(positions.Length - 1);
+
+            positions += "]";
+
+            return positions;
+        }
+
     }
 }

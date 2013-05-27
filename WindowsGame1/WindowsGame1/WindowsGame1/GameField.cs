@@ -15,9 +15,10 @@ namespace WindowsGame1
         private List<Vector2> boundPositions;
         private int gameFieldWidth;
         private int gameFieldHeight;
+        private int topBorderY;
 
 
-        public void Initialize(Texture2D texture,GraphicsDeviceManager graphics)
+        public void Initialize(int topBorderY,Texture2D texture,GraphicsDeviceManager graphics)
         {
             this.Texture = texture;
             this.graphics = graphics;
@@ -25,17 +26,18 @@ namespace WindowsGame1
 
             this.gameFieldWidth = graphics.GraphicsDevice.Viewport.Width;
             this.gameFieldHeight = graphics.GraphicsDevice.Viewport.Height;
+            this.topBorderY = topBorderY;
 
 
             boundPositions=new List<Vector2>();
 
             for (int i = 0; i < gameFieldWidth; i = i + 16)
             {
-                boundPositions.Add(new Vector2(i,0));
+                boundPositions.Add(new Vector2(i,topBorderY));
                 boundPositions.Add(new Vector2(i, gameFieldHeight- Texture.Height));
             }
 
-            for (int i = 0; i < gameFieldHeight; i = i + 16)
+            for (int i = topBorderY; i < gameFieldHeight; i = i + 16)
             {
                 boundPositions.Add(new Vector2(0,i));
                 boundPositions.Add(new Vector2(gameFieldWidth - Texture.Width, i));
@@ -50,13 +52,13 @@ namespace WindowsGame1
         }
 
 
-        public Boolean collides(Snake snake){
-            if (snake.Position.X < 16 || snake.Position.X > (gameFieldWidth-Texture.Width))
+        public Boolean collides(Vector2 Position){
+            if (Position.X <= Texture.Width || Position.X > (gameFieldWidth-Texture.Width))
             {
                 return true;
             }
 
-            if (snake.Position.Y < 16 || snake.Position.Y > (gameFieldWidth - Texture.Width))
+            if (Position.Y <= (topBorderY+Texture.Height) || Position.Y > (gameFieldHeight - Texture.Height))
             {
                 return true;
             }

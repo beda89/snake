@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Microsoft.Xna.Framework;
@@ -45,26 +46,25 @@ namespace WindowsGame1
     ///
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-    //    Snake snake;
-        GameField gameField;
-        KeyboardState currentKeyboardState;
-        GamePadState currentGamePadState;
-        Vector2 menuPosition;
-        Thread serverThread;
-        Thread clientThread;
+        private const int TOPBOUND_Y = 32;
 
 
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+        private GameField gameField;
+        private KeyboardState currentKeyboardState;
+        private GamePadState currentGamePadState;
+        private Vector2 menuPosition;
+        private Thread serverThread;
+        private Thread clientThread;
 
-       
         private GameState gameState;
         private InGameState inGameState;
 
         private Menu mainMenu;
-        private Menu networkMenuServer;
+        private NetworkMenuServer networkMenuServer;
         private NetworkMenuServerWaiting networkMenuServerWaiting;
-        private Menu networkMenuClient;
+        private NetworkMenuClient networkMenuClient;
         private Menu networkMenuClientWaiting;
 
         private Server server;
@@ -75,8 +75,7 @@ namespace WindowsGame1
         //server manages the snakes
         private List<Snake> snakes;
 
-        Texture2D snakeTexture;
-
+        Texture2D[] snakeTexture = new Texture2D[4];
 
         public Game1()
         {
@@ -106,7 +105,6 @@ namespace WindowsGame1
 
             menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-          //  snake = new Snake();
             gameField = new GameField();
             mainMenu = new MainMenu(Content,menuPosition);
             networkMenuServer = new NetworkMenuServer(Content, menuPosition);
@@ -114,18 +112,15 @@ namespace WindowsGame1
             networkMenuClientWaiting = new NetworkMenuClientWaiting(Content, menuPosition);
             networkMenuServerWaiting = new NetworkMenuServerWaiting(Content, menuPosition);
 
-
             gameState = GameState.MAIN_MENU;
 
-
             //Load snake texture from Content project
-            snakeTexture = Content.Load<Texture2D>("snakeTexture");
-        //    snake.Initialize(snakeTexture, new Vector2(256f, 256f));
-
+            snakeTexture[0] = Content.Load<Texture2D>("snakeTexture1");
+            snakeTexture[1] = Content.Load<Texture2D>("snakeTexture2");
+            snakeTexture[2] = Content.Load<Texture2D>("snakeTexture3");
+            snakeTexture[3] = Content.Load<Texture2D>("snakeTexture4");
             Texture2D boundsTexture = Content.Load<Texture2D>("boundsTexture");
-            gameField.Initialize(boundsTexture,graphics);
-
-
+            gameField.Initialize(TOPBOUND_Y,boundsTexture,graphics);
         }
 
         /// <summary>
@@ -144,6 +139,9 @@ namespace WindowsGame1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            int port;
+            String ip;
+
             switch (gameState)
             {
                 case GameState.MAIN_MENU:
@@ -159,7 +157,16 @@ namespace WindowsGame1
                     break;
 
                 case GameState.CONNECT_TO_SERVER:
-                    client = new Client("localhost",20000,snakeTexture);
+                    if (!networkMenuClient.checkInputFields())
+                    {
+                        gameState = GameState.NETWORK_MENU_CLIENT;
+                        break;
+                    }
+
+                    port = Convert.ToInt32(networkMenuClient.getPort());
+                    ip = networkMenuClient.getIP();
+
+                    client = new Client(ip,port,snakeTexture);
                     clientThread = new System.Threading.Thread(client.start);
                     clientThread.Start();
                     gameState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
@@ -180,7 +187,20 @@ namespace WindowsGame1
                     break;
 
                 case GameState.START_SERVER:
-                    server = new Server(20000);
+
+                    try
+                    {
+                        port = Convert.ToInt32(networkMenuServer.portInput.InputText);
+                    }
+                    catch (FormatException)
+                    {
+                        gameState = GameState.NETWORK_MENU_SERVER;
+                        break;
+                    }
+                        
+                    server = new Server(port);
+                    
+
                     //TODO check if threadStart is needed!
                     serverThread = new System.Threading.Thread(server.start);
                     serverThread.Start();
@@ -226,19 +246,16 @@ namespace WindowsGame1
 
                     if (inGameState == InGameState.STARTING)
                     {
-
-                        
                         //init snakes, first one is needed for server
                         snakes = new List<Snake>();
                         Snake snake = new Snake();
-                        snake.Initialize(snakeTexture, new Vector2(32f, 32f),Snake.Direction.Right);
+                        snake.Initialize(snakeTexture[0], new Vector2(128f, 64f),Snake.Direction.Right);
                         snakes.Add(snake);
-
 
                         for (int i = 0; i < server.getCurrentClients().Count(); i++)
                         {
                             snake= new Snake();
-                            snake.Initialize(snakeTexture, new Vector2(256f, 256f), Snake.Direction.Up);
+                            snake.Initialize(snakeTexture[i+1], new Vector2(256f, 256f), Snake.Direction.Up);
                             snakes.Add(snake);
                         }
                         
@@ -260,7 +277,7 @@ namespace WindowsGame1
                         client.setClientInGameState(InGameState.RUNNING);
                     }
 
-                    snakes = client.getSnakes();
+                    snakes = client.snakes;
 
                     UpdateSnakes(snakes,gameTime);
                     break;
@@ -295,7 +312,6 @@ namespace WindowsGame1
 
         } */
 
-
          private void UpdateSnakes(List<Snake> snakes,GameTime gameTime)
          {
 
@@ -328,7 +344,7 @@ namespace WindowsGame1
                         setDirection(snake);
                     }
 
-                    snake.Update(gameTime);
+                    snake.Update(gameTime,gameField);
                     index++;
                 }
             }
@@ -418,18 +434,6 @@ namespace WindowsGame1
                 case GameState.CONNECTION_REFUSED:
                     networkMenuClient.Draw(spriteBatch);
                     break;
-
-              /*  case GameState.PLAY_CLIENT:
-                    this.IsMouseVisible = false;
-                    if (snakes != null)
-                    {
-                        foreach (Snake snake in snakes)
-                        {
-                            snake.Draw(spriteBatch);
-                            gameField.Draw(spriteBatch);
-                        }
-                    }
-                    break; */
 
                 case GameState.NETWORK_MENU_WAITING_FOR_CLIENTS:
                     networkMenuServerWaiting.Draw(spriteBatch);

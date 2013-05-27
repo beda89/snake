@@ -29,7 +29,6 @@ namespace WindowsGame1.Menus
             Texture2D pixel = new Texture2D(spriteBatch.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixel.SetData<Color>(new Color[] { BackgroundColor });
             spriteBatch.Draw(pixel, Position, Color.White);
-
             spriteBatch.DrawString(font, Text, new Vector2(Position.Left+10,Position.Top), Color);
         }
 

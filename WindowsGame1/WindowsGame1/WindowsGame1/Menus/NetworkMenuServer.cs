@@ -11,12 +11,12 @@ namespace WindowsGame1.Menus
 {
     class NetworkMenuServer: Menu
     {
-        private const int HEIGHT = 30;
+        //TODO: put this in superClass
 
-        private ContentManager content;
+
+        public PortInputField portInput { get; set; }
+
         private Vector2 startPosition;
-        private InputField portInput;
-
 
         public NetworkMenuServer(ContentManager content, Vector2 startPosition)
             : base(content,GameState.NETWORK_MENU_SERVER)
@@ -24,10 +24,10 @@ namespace WindowsGame1.Menus
 
             this.startPosition = startPosition;
 
-            items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, 150, HEIGHT), GameState.START_SERVER));
-            items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), 150, HEIGHT), GameState.MAIN_MENU));
+            items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, WIDTH, HEIGHT), GameState.START_SERVER));
+            items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), WIDTH, HEIGHT), GameState.MAIN_MENU));
 
-            portInput = new InputField("Port:", new Vector2(startPosition.X, 100), base.font, Color.Black,6);
+            portInput = new PortInputField("Port:", new Vector2(startPosition.X, 100), base.font, Color.Black,6);
             portInput.focus();
 
         }
@@ -35,7 +35,6 @@ namespace WindowsGame1.Menus
         public override void Update()
         {
             portInput.Update();
-
             base.Update();
         }
 
