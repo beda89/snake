@@ -6,9 +6,9 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using WindowsGame1.Menus;
+using Snake.Menus;
 
-namespace WindowsGame1.Menus.Input
+namespace Snake.Menus.Input
 {
         class IPInputField:InputField
         {

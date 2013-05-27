@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsGame1", "WindowsGame1\WindowsGame1\WindowsGame1.csproj", "{A22B306D-2E3C-4BFB-91C7-91F9D7E8707A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snake", "WindowsGame1\WindowsGame1\Snake.csproj", "{A22B306D-2E3C-4BFB-91C7-91F9D7E8707A}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "WindowsGame1Content", "WindowsGame1\WindowsGame1Content\WindowsGame1Content.contentproj", "{5EFD7A27-DDF4-4872-A5D8-AECC63F89076}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsGame1Content", "WindowsGame1\WindowsGame1Content\WindowsGame1Content.contentproj", "{5EFD7A27-DDF4-4872-A5D8-AECC63F89076}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

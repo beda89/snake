@@ -6,10 +6,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Microsoft.Xna.Framework;
-using WindowsGame1.Exceptions;
+using Snake.Exceptions;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace WindowsGame1
+namespace Snake
 {
     class Client
     {

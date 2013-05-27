@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using WindowsGame1.Menus.Input;
+using Snake.Menus.Input;
 
-namespace WindowsGame1.Menus
+namespace Snake.Menus
 {
     class NetworkMenuClient:Menu
     {

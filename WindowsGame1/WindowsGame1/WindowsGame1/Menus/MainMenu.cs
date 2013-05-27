@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 
-namespace WindowsGame1.Menus
+namespace Snake.Menus
 {
     class MainMenu:Menu
     {

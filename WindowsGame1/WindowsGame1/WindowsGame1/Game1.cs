@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using WindowsGame1.Menus;
+using Snake.Menus;
 
-namespace WindowsGame1
+namespace Snake
 {
 
     public enum GameState { MAIN_MENU, 
@@ -100,6 +100,7 @@ namespace WindowsGame1
         protected override void Initialize()
         {
             base.Initialize();
+            this.Window.Title = "Snake";
 
             menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
             spriteBatch = new SpriteBatch(GraphicsDevice);
