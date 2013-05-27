@@ -13,33 +13,44 @@ namespace WindowsGame1
 {
     class Client
     {
-        public Snake.Direction clientSnakeDirection { get; set; }
-        public List<Snake> snakes { get; set; }
+        public Snake.Direction ClientSnakeDirection { get; set; }
+
+        //every snake in play(are initialized and managed by server)
+        public List<Snake> Snakes { get; set; }
+        public GameState ClientGameState { get; private set; }
+
+        //states while playing
+        public InGameState InGameState{get;set;} 
+
+        //snakeNumber assigned by server, server is always 0
+        public int SnakeNumber { get; private set; }
 
         private String ip;
         private int port;
         private TcpClient tcpClient;
         private NetworkStream stream;
-        private GameState clientState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
-        private InGameState inGameState = InGameState.STARTING;
+
+
         private Texture2D[] snakeTexture;
         
-        //snakeNumber assigned by server, server is always 0
-        public int snakeNumber;
+
 
         public Client(String ipString, int port,Texture2D[] texture)
         {
+
+           this.InGameState = InGameState.STARTING;
+           this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
            this.ip = ipString;
            this.port = port;
 
            //TODO:dummy value
-           clientSnakeDirection = Snake.Direction.Left;
+           ClientSnakeDirection = Snake.Direction.Left;
 
-           snakes = new List<Snake>();
+           Snakes = new List<Snake>();
            this.snakeTexture = texture;
         }
 
-        public void start(){
+        public void Start(){
 
             try
             {
@@ -61,26 +72,11 @@ namespace WindowsGame1
             }
             catch (SocketException)
             {
-                clientState = GameState.CONNECTION_REFUSED;
+                ClientGameState = GameState.CONNECTION_REFUSED;
             }
         } 
 
-        public GameState getClientState()
-        {
-            return clientState;
-        }
-
-        public InGameState getClientInGameState()
-        {
-            return inGameState;
-        }
-
-        public void setClientInGameState(InGameState inGameState)
-        {
-            this.inGameState = inGameState;
-        }
-
-        public void stop()
+        public void Stop()
         {
             if (stream != null)
             {
@@ -93,14 +89,9 @@ namespace WindowsGame1
             }
         }
 
-        public int getSnakeNumber()
-        {
-            return snakeNumber;
-        }
-
         private void sendSnakeDirection(StreamWriter writer)
         {
-            writer.WriteLine("!game "+clientSnakeDirection+" !");
+            writer.WriteLine("!game "+ClientSnakeDirection+" !");
             writer.Flush();
         }
 
@@ -110,10 +101,10 @@ namespace WindowsGame1
             {
                 String[] splittedMessage = message.Split(new Char[]{' '}, 3);
 
-                clientState = GameState.PLAY_CLIENT;
-                inGameState = InGameState.STARTING;
+                ClientGameState = GameState.PLAY_CLIENT;
+                InGameState = InGameState.STARTING;
 
-                snakeNumber = Convert.ToInt32(splittedMessage[1]);
+                SnakeNumber = Convert.ToInt32(splittedMessage[1]);
 
                 String[] snakePositions = seperateSnakes(splittedMessage[2]);
 
@@ -145,7 +136,7 @@ namespace WindowsGame1
 
                 Snake snake = new Snake();
                 snake.Initialize(snakeTexture[snakeIndex], parts);
-                snakes.Add(snake);
+                Snakes.Add(snake);
                 snakeIndex++;
             }
         }
@@ -158,7 +149,7 @@ namespace WindowsGame1
             {
                 List<Vector2> parts = parsePositionString(snakePositionStrings[i]);
 
-                snakes.ElementAt(snakeIndex).parts = parts;
+                Snakes.ElementAt(snakeIndex).parts = parts;
                 snakeIndex++;
             }
         }

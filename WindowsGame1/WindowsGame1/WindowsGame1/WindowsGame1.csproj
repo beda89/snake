@@ -89,6 +89,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="Exceptions\MessageException.cs" />
     <Compile Include="GameField.cs" />
+    <Compile Include="Menus\InputField.cs" />
     <Compile Include="Menus\PortInputField.cs" />
     <Compile Include="Menus\IPInputField.cs" />
     <Compile Include="Menus\MainMenu.cs" />

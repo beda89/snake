@@ -48,7 +48,6 @@ namespace WindowsGame1
     {
         private const int TOPBOUND_Y = 32;
 
-
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private GameField gameField;
@@ -69,6 +68,10 @@ namespace WindowsGame1
 
         private Server server;
         private Client client;
+
+        private Texture2D snakePic;
+        private Texture2D boundsTexture;
+        private SpriteFont customFont;
 
         private Boolean isClient = false;
 
@@ -93,6 +96,22 @@ namespace WindowsGame1
         protected override void Initialize()
         {
             base.Initialize();
+
+            menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            mainMenu = new MainMenu(snakePic, customFont, menuPosition);
+            networkMenuServer = new NetworkMenuServer(snakePic, customFont, menuPosition);
+            networkMenuClient = new NetworkMenuClient(snakePic, customFont, menuPosition);
+            networkMenuClientWaiting = new NetworkMenuClientWaiting(snakePic, customFont, menuPosition);
+            networkMenuServerWaiting = new NetworkMenuServerWaiting(snakePic, customFont, menuPosition);
+
+            gameField = new GameField();
+            gameField.Initialize(TOPBOUND_Y, boundsTexture, graphics);
+
+            //initial GameState
+            gameState = GameState.MAIN_MENU;
+
         }
 
         /// <summary>
@@ -101,26 +120,14 @@ namespace WindowsGame1
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-
-            menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            gameField = new GameField();
-            mainMenu = new MainMenu(Content,menuPosition);
-            networkMenuServer = new NetworkMenuServer(Content, menuPosition);
-            networkMenuClient = new NetworkMenuClient(Content, menuPosition);
-            networkMenuClientWaiting = new NetworkMenuClientWaiting(Content, menuPosition);
-            networkMenuServerWaiting = new NetworkMenuServerWaiting(Content, menuPosition);
-
-            gameState = GameState.MAIN_MENU;
-
-            //Load snake texture from Content project
             snakeTexture[0] = Content.Load<Texture2D>("snakeTexture1");
             snakeTexture[1] = Content.Load<Texture2D>("snakeTexture2");
             snakeTexture[2] = Content.Load<Texture2D>("snakeTexture3");
             snakeTexture[3] = Content.Load<Texture2D>("snakeTexture4");
-            Texture2D boundsTexture = Content.Load<Texture2D>("boundsTexture");
-            gameField.Initialize(TOPBOUND_Y,boundsTexture,graphics);
+
+            customFont = Content.Load<SpriteFont>("customFont");
+            snakePic = Content.Load<Texture2D>("snake-cartoon_small");
+            boundsTexture = Content.Load<Texture2D>("boundsTexture");
         }
 
         /// <summary>
@@ -129,7 +136,12 @@ namespace WindowsGame1
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+            snakeTexture[0].Dispose();
+            snakeTexture[1].Dispose();
+            snakeTexture[2].Dispose();
+            snakeTexture[3].Dispose();
+            boundsTexture.Dispose();
+            snakePic.Dispose();
         }
 
         /// <summary>
@@ -157,17 +169,17 @@ namespace WindowsGame1
                     break;
 
                 case GameState.CONNECT_TO_SERVER:
-                    if (!networkMenuClient.checkInputFields())
+                    if (!networkMenuClient.CheckInputFields())
                     {
                         gameState = GameState.NETWORK_MENU_CLIENT;
                         break;
                     }
 
-                    port = Convert.ToInt32(networkMenuClient.getPort());
-                    ip = networkMenuClient.getIP();
+                    port = Convert.ToInt32(networkMenuClient.GetPort());
+                    ip = networkMenuClient.GetIP();
 
                     client = new Client(ip,port,snakeTexture);
-                    clientThread = new System.Threading.Thread(client.start);
+                    clientThread = new System.Threading.Thread(client.Start);
                     clientThread.Start();
                     gameState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
 
@@ -181,7 +193,7 @@ namespace WindowsGame1
                     //if gamestate of menu is waiting for Server, we have to check if the connection was refused
                     if (gameState == GameState.NETWORK_MENU_WAITING_FOR_SERVER)
                     {
-                        gameState = client.getClientState();
+                        gameState = client.ClientGameState;
                     }
 
                     break;
@@ -202,7 +214,7 @@ namespace WindowsGame1
                     
 
                     //TODO check if threadStart is needed!
-                    serverThread = new System.Threading.Thread(server.start);
+                    serverThread = new System.Threading.Thread(server.Start);
                     serverThread.Start();
                     networkMenuServerWaiting.Update(server);
                     gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
@@ -228,21 +240,21 @@ namespace WindowsGame1
                     break;
 
                 case GameState.DISCONNECT_SERVER:
-                    server.stop();
+                    server.Stop();
                     serverThread.Abort();
                     gameState = GameState.MAIN_MENU;
                     server = null;
                     break;
 
                 case GameState.DISCONNECT_CLIENT:
-                    client.stop();
+                    client.Stop();
                     clientThread.Abort();
                     gameState = GameState.MAIN_MENU;
                     client = null;
                     break;
 
                 case GameState.PLAY_SERVER:
-                    inGameState = server.getInGameState();
+                    inGameState = server.InGameState;
 
                     if (inGameState == InGameState.STARTING)
                     {
@@ -252,7 +264,7 @@ namespace WindowsGame1
                         snake.Initialize(snakeTexture[0], new Vector2(128f, 64f),Snake.Direction.Right);
                         snakes.Add(snake);
 
-                        for (int i = 0; i < server.getCurrentClients().Count(); i++)
+                        for (int i = 0; i < server.CurrentClients.Count(); i++)
                         {
                             snake= new Snake();
                             snake.Initialize(snakeTexture[i+1], new Vector2(256f, 256f), Snake.Direction.Up);
@@ -264,7 +276,7 @@ namespace WindowsGame1
                         server.sendStartSignal(snakes);
                     }
 
-                    snakes=server.communicateWithClients(snakes);
+                    snakes=server.CommunicateWithClients(snakes);
 
 
                     UpdateSnakes(snakes,gameTime);
@@ -272,18 +284,17 @@ namespace WindowsGame1
                     break;
 
                 case GameState.PLAY_CLIENT:
-                    if (client.getClientInGameState() == InGameState.STARTING)
+                    if (client.InGameState == InGameState.STARTING)
                     {
-                        client.setClientInGameState(InGameState.RUNNING);
+                        client.InGameState=InGameState.RUNNING;
                     }
 
-                    snakes = client.snakes;
+                    snakes = client.Snakes;
 
                     UpdateSnakes(snakes,gameTime);
                     break;
 
                 case GameState.EXIT:
-
                     //TODO clean up all resources on exit
                     this.Exit();
                     break;
@@ -321,10 +332,10 @@ namespace WindowsGame1
                 //server snake is always the first one
                 foreach (Snake snake in snakes)
                 {
-                      if (index == client.getSnakeNumber())
+                      if (index == client.SnakeNumber)
                       {
                         setDirection(snake);
-                        client.clientSnakeDirection = snake.SnakeDirection;
+                        client.ClientSnakeDirection = snake.SnakeDirection;
 
                      }
 

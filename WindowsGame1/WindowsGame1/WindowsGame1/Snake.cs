@@ -13,22 +13,20 @@ namespace WindowsGame1
         private Texture2D Texture;
         public enum Direction { Up, Right, Down, Left };
 
+        //the parts of the snake as a list (every snake segment)
         public List<Vector2> parts{get;set;}
         public Direction SnakeDirection;
 
         // The time since we last updated the frame
         private int elapsedTime;
-
         // The time we display a frame until the next one
-        private int frameTime;
+        private int frameTime= 250;
 
         //only called by server
         public void Initialize(Texture2D texture, Vector2 position,Direction SnakeDirection)
         {
             this.Position = position;
             this.Texture = texture;
-
-            frameTime = 250;
 
             this.SnakeDirection = SnakeDirection;
 
@@ -63,8 +61,6 @@ namespace WindowsGame1
         //only called by client
         public void Initialize(Texture2D texture, List<Vector2> parts)
         {
-            frameTime = 250;
-
             this.parts = parts;
             this.Texture = texture;
         }
@@ -97,7 +93,7 @@ namespace WindowsGame1
                         break;
                 }
 
-                if (gameField.collides(tempPosition))
+                if (gameField.Collides(tempPosition))
                 {
                     return;
                 }

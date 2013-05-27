@@ -9,56 +9,51 @@ namespace WindowsGame1
     class GameField
     {
         // The image representing a border segment
-        public Texture2D Texture;
-
+        private Texture2D texture;
         private GraphicsDeviceManager graphics;
         private List<Vector2> boundPositions;
         private int gameFieldWidth;
         private int gameFieldHeight;
         private int topBorderY;
 
-
         public void Initialize(int topBorderY,Texture2D texture,GraphicsDeviceManager graphics)
         {
-            this.Texture = texture;
+            this.texture = texture;
             this.graphics = graphics;
-
 
             this.gameFieldWidth = graphics.GraphicsDevice.Viewport.Width;
             this.gameFieldHeight = graphics.GraphicsDevice.Viewport.Height;
             this.topBorderY = topBorderY;
-
 
             boundPositions=new List<Vector2>();
 
             for (int i = 0; i < gameFieldWidth; i = i + 16)
             {
                 boundPositions.Add(new Vector2(i,topBorderY));
-                boundPositions.Add(new Vector2(i, gameFieldHeight- Texture.Height));
+                boundPositions.Add(new Vector2(i, gameFieldHeight- texture.Height));
             }
 
             for (int i = topBorderY; i < gameFieldHeight; i = i + 16)
             {
                 boundPositions.Add(new Vector2(0,i));
-                boundPositions.Add(new Vector2(gameFieldWidth - Texture.Width, i));
+                boundPositions.Add(new Vector2(gameFieldWidth - texture.Width, i));
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             foreach(Vector2 vector in boundPositions){
-                spriteBatch.Draw(Texture, vector, Color.White);
+                spriteBatch.Draw(texture, vector, Color.White);
             }
         }
 
-
-        public Boolean collides(Vector2 Position){
-            if (Position.X <= Texture.Width || Position.X > (gameFieldWidth-Texture.Width))
+        public Boolean Collides(Vector2 position){
+            if (position.X <= texture.Width || position.X > (gameFieldWidth-texture.Width))
             {
                 return true;
             }
 
-            if (Position.Y <= (topBorderY+Texture.Height) || Position.Y > (gameFieldHeight - Texture.Height))
+            if (position.Y <= (topBorderY+texture.Height) || position.Y > (gameFieldHeight - texture.Height))
             {
                 return true;
             }

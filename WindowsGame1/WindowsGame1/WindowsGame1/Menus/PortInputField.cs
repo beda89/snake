@@ -5,13 +5,13 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using WindowsGame1.Menus;
 
 namespace WindowsGame1
 {
-    class PortInputField
+    class PortInputField:InputField
     {
         private const int MAX_PORT = 65535;
-
 
         public String InputText { get; private set; }
         public Rectangle inputFieldSize { get; set; }
@@ -22,10 +22,8 @@ namespace WindowsGame1
         private Color txtColor;
         private Keys lastKey = Keys.None;
         private int maxInput;
-        private Color backgroundColor;
-        private Boolean isFocused;
 
-        public PortInputField(String label, Vector2 position,SpriteFont font,Color txtColor,int maxInputLength)
+        public PortInputField(String label, Vector2 position,SpriteFont font,Color txtColor,int maxInputLength):base()
         {
             this.position = position;
             this.label = label;
@@ -82,19 +80,7 @@ namespace WindowsGame1
             spriteBatch.DrawString(font,InputText,new Vector2(inputFieldSize.X+10,inputFieldSize.Y),Color.Gray);
         }
 
-        public void focus()
-        {
-            isFocused = true;
-            backgroundColor = Color.LightBlue;
-        }
-
-        public void unFocus()
-        {
-            isFocused = false;
-            backgroundColor = Color.LightGray;
-        }
-
-        public Boolean checkPortInput()
+        public Boolean CheckPortInput()
         {
             int port;
             try

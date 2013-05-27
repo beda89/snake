@@ -11,25 +11,16 @@ namespace WindowsGame1.Menus
 {
     class NetworkMenuServer: Menu
     {
-        //TODO: put this in superClass
-
-
         public PortInputField portInput { get; set; }
 
-        private Vector2 startPosition;
-
-        public NetworkMenuServer(ContentManager content, Vector2 startPosition)
-            : base(content,GameState.NETWORK_MENU_SERVER)
+        public NetworkMenuServer(Texture2D snakePic, SpriteFont customFont, Vector2 startPosition)
+            : base(snakePic, customFont,startPosition, GameState.NETWORK_MENU_SERVER)
         {
-
-            this.startPosition = startPosition;
-
             items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, WIDTH, HEIGHT), GameState.START_SERVER));
             items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), WIDTH, HEIGHT), GameState.MAIN_MENU));
 
             portInput = new PortInputField("Port:", new Vector2(startPosition.X, 100), base.font, Color.Black,6);
-            portInput.focus();
-
+            portInput.Focus();
         }
 
         public override void Update()

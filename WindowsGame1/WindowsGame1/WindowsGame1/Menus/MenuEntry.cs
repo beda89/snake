@@ -10,10 +10,12 @@ namespace WindowsGame1.Menus
     class MenuEntry
     {
         public Rectangle Position { set; get; }
-        public String Text { set; get; }
-        public Color Color { set; get;}
         public Color BackgroundColor { set; get; }
+        public Color Color { set; get; }
         public GameState Gamestate { set; get; }
+
+        private String Text;
+
 
         public MenuEntry(String text, Color color, Color backgroundColor, Rectangle position,GameState gameState)
         {

@@ -14,9 +14,12 @@ namespace WindowsGame1.Menus
         protected const int HEIGHT = 30;
         protected const int WIDTH = 150;
 
+        #region fields
+
         protected List<MenuEntry> items;
         protected SpriteFont font;
         protected GameState standardState;
+        protected Vector2 startPosition;
 
         private MouseState oldMouseState;
         private MouseState currentMouseState;
@@ -24,15 +27,20 @@ namespace WindowsGame1.Menus
         private Rectangle snakePosition;
         private GameState currentState;
 
-        public Menu(ContentManager content,GameState standardState)
+        #endregion
+
+        public Menu(Texture2D snakePic, SpriteFont font,Vector2 startPosition, GameState standardState)
         {
-            this.font = content.Load<SpriteFont>("customFont");
-            this.snakePic = content.Load<Texture2D>("snake-cartoon_small");
+            this.font = font;
+            this.snakePic = snakePic;
+            this.startPosition = startPosition;
+
             this.snakePosition = new Rectangle(400, 50, snakePic.Width, snakePic.Height);
             this.standardState = standardState;
             this.currentState = standardState;
             this.items = new List<MenuEntry>();
         }
+
 
         public virtual void Update()
         {

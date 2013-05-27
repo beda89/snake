@@ -6,11 +6,14 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using WindowsGame1.Menus;
 
 namespace WindowsGame1
 {
-        class IPInputField
+        class IPInputField:InputField
         {
+            #region fields
+
             public Rectangle inputFieldPosition { get; set; }
             public String InputText { get; private set; }
 
@@ -20,10 +23,10 @@ namespace WindowsGame1
             private SpriteFont font;
             private Color txtColor;
             private int maxInput;
-            private Color backgroundColor;
-            private Boolean isFocused = false;
 
-            public IPInputField(String label, Vector2 position, SpriteFont font, Color txtColor, int maxInputLength)
+            #endregion
+
+            public IPInputField(String label, Vector2 position, SpriteFont font, Color txtColor, int maxInputLength):base()
             {
                 this.position = position;
                 this.label = label;
@@ -35,7 +38,6 @@ namespace WindowsGame1
 
                 this.inputFieldPosition = new Rectangle((int)position.X, (int)position.Y + 35, maxInput * 12+10, 30);
             }
-
 
             public void Update()
             {
@@ -84,18 +86,6 @@ namespace WindowsGame1
                 spriteBatch.Draw(pixel, inputFieldPosition, Color.White);
 
                 spriteBatch.DrawString(font, InputText, new Vector2(inputFieldPosition.X + 10, inputFieldPosition.Y), Color.Gray);
-            }
-
-            public void Focus()
-            {
-                isFocused = true;
-                backgroundColor = Color.LightBlue;
-            }
-
-            public void UnFocus()
-            {
-                isFocused = false;
-                backgroundColor = Color.LightGray;
             }
 
             public Boolean CheckIpInput()
