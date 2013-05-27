@@ -8,13 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using WindowsGame1.Menus;
 
-namespace WindowsGame1
+namespace WindowsGame1.Menus.Input
 {
         class IPInputField:InputField
         {
             #region fields
 
-            public Rectangle inputFieldPosition { get; set; }
+            public Rectangle InputFieldPosition { get; set; }
             public String InputText { get; private set; }
 
             private Keys lastKey = Keys.None;
@@ -36,7 +36,7 @@ namespace WindowsGame1
                 this.backgroundColor = Color.LightGray;
                 this.InputText = "";
 
-                this.inputFieldPosition = new Rectangle((int)position.X, (int)position.Y + 35, maxInput * 12+10, 30);
+                this.InputFieldPosition = new Rectangle((int)position.X, (int)position.Y + 35, maxInput * 12+10, 30);
             }
 
             public void Update()
@@ -83,9 +83,9 @@ namespace WindowsGame1
                 pixel.SetData<Color>(new Color[] { backgroundColor });
 
 
-                spriteBatch.Draw(pixel, inputFieldPosition, Color.White);
+                spriteBatch.Draw(pixel, InputFieldPosition, Color.White);
 
-                spriteBatch.DrawString(font, InputText, new Vector2(inputFieldPosition.X + 10, inputFieldPosition.Y), Color.Gray);
+                spriteBatch.DrawString(font, InputText, new Vector2(InputFieldPosition.X + 10, InputFieldPosition.Y), Color.Gray);
             }
 
             public Boolean CheckIpInput()

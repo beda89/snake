@@ -30,28 +30,24 @@ namespace WindowsGame1
         private TcpClient tcpClient;
         private NetworkStream stream;
 
-
         private Texture2D[] snakeTexture;
         
-
-
         public Client(String ipString, int port,Texture2D[] texture)
         {
-
-           this.InGameState = InGameState.STARTING;
-           this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
-           this.ip = ipString;
-           this.port = port;
+            
+            this.InGameState = InGameState.STARTING;
+            this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
+            this.ip = ipString;
+            this.port = port;
+            this.snakeTexture = texture;
 
            //TODO:dummy value
            ClientSnakeDirection = Snake.Direction.Left;
 
            Snakes = new List<Snake>();
-           this.snakeTexture = texture;
         }
 
         public void Start(){
-
             try
             {
                 tcpClient = new TcpClient(ip, port);
@@ -121,11 +117,12 @@ namespace WindowsGame1
             }
             else if (message.StartsWith("!end"))
             {
-
+                 //TODO
 
             }
         }
 
+        //initalizes every snakes at the beginning of the game, according to the start message of the server
         private void initSnakesAndSetPositions(String[] snakePositionStrings)
         {
             int snakeIndex = 0;
@@ -141,6 +138,7 @@ namespace WindowsGame1
             }
         }
 
+        //sets the current positions of every snake according to the server message
         private void setSnakePositions(String[] snakePositionStrings)
         {
             int snakeIndex = 0;
@@ -154,6 +152,7 @@ namespace WindowsGame1
             }
         }
 
+        //splits the received message in the positionStrings according to every snake
         private String[] seperateSnakes(String message)
         {
             String[] snakePositionStrings;
@@ -174,11 +173,14 @@ namespace WindowsGame1
             return snakePositionStrings;
         }
 
+        //parses the positionString according to one snake
         private List<Vector2> parsePositionString(String positionString)
         {
             String[] splittedPositions = positionString.Split(' ');
             List<Vector2> parts = new List<Vector2>();
 
+
+            //there always has to be a position.X and position.Y pair
             if (splittedPositions.Length % 2 == 1)
             {
                 throw new MessageException();

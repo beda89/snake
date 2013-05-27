@@ -14,12 +14,12 @@ namespace WindowsGame1.Menus
         public Color Color { set; get; }
         public GameState Gamestate { set; get; }
 
-        private String Text;
+        private String text;
 
 
         public MenuEntry(String text, Color color, Color backgroundColor, Rectangle position,GameState gameState)
         {
-            this.Text = text;
+            this.text = text;
             this.Color = color;
             this.BackgroundColor = backgroundColor;
             this.Position = position;
@@ -31,7 +31,7 @@ namespace WindowsGame1.Menus
             Texture2D pixel = new Texture2D(spriteBatch.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixel.SetData<Color>(new Color[] { BackgroundColor });
             spriteBatch.Draw(pixel, Position, Color.White);
-            spriteBatch.DrawString(font, Text, new Vector2(Position.Left+10,Position.Top), Color);
+            spriteBatch.DrawString(font, text, new Vector2(Position.Left+10,Position.Top), Color);
         }
 
     }

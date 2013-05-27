@@ -11,10 +11,25 @@ namespace WindowsGame1.Menus
 {
     class Menu
     {
-        protected const int HEIGHT = 30;
-        protected const int WIDTH = 150;
+        protected const int ITEM_HEIGHT = 30;
+        protected const int ITEM_WIDTH = 150;
+        protected const int ITEM_SPACING_Y = 5;
 
         #region fields
+
+        private GameState currentState;
+        public GameState CurrentState
+        {
+            get
+            {
+                //currentState is set back to the standardMenu state,if user comes back to this menu
+                GameState temp = currentState;
+                currentState = standardState;
+                return temp;
+            }
+
+            private set{currentState=value;}
+        }
 
         protected List<MenuEntry> items;
         protected SpriteFont font;
@@ -25,7 +40,6 @@ namespace WindowsGame1.Menus
         private MouseState currentMouseState;
         private Texture2D snakePic;
         private Rectangle snakePosition;
-        private GameState currentState;
 
         #endregion
 
@@ -41,7 +55,6 @@ namespace WindowsGame1.Menus
             this.items = new List<MenuEntry>();
         }
 
-
         public virtual void Update()
         {
             oldMouseState = currentMouseState;
@@ -56,7 +69,7 @@ namespace WindowsGame1.Menus
                 {
                     if (entry.Position.Intersects(mousePosition))
                     {
-                        currentState = entry.Gamestate;
+                        CurrentState = entry.Gamestate;
                     }
                 }
 
@@ -81,14 +94,6 @@ namespace WindowsGame1.Menus
             {
                 entry.Draw(spriteBatch, font);
             }
-        }
-
-        public virtual GameState getCurrentState()
-        {
-            //currentState is set back to the standardMenu state,if user comes back to this menu
-            GameState temp = currentState;
-            currentState = standardState;
-            return temp;
         }
 
     }

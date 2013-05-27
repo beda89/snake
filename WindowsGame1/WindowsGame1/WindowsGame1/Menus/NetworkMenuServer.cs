@@ -6,26 +6,27 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using WindowsGame1.Menus.Input;
 
 namespace WindowsGame1.Menus
 {
     class NetworkMenuServer: Menu
     {
-        public PortInputField portInput { get; set; }
+        public PortInputField PortInput { get; private set; }
 
         public NetworkMenuServer(Texture2D snakePic, SpriteFont customFont, Vector2 startPosition)
             : base(snakePic, customFont,startPosition, GameState.NETWORK_MENU_SERVER)
         {
-            items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, WIDTH, HEIGHT), GameState.START_SERVER));
-            items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), WIDTH, HEIGHT), GameState.MAIN_MENU));
+            items.Add(new MenuEntry("Start Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, ITEM_WIDTH, ITEM_HEIGHT), GameState.START_SERVER));
+            items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), GameState.MAIN_MENU));
 
-            portInput = new PortInputField("Port:", new Vector2(startPosition.X, 100), base.font, Color.Black,6);
-            portInput.Focus();
+            PortInput = new PortInputField("Port:", new Vector2(startPosition.X, 100), base.font, Color.Black,6);
+            PortInput.Focus();
         }
 
         public override void Update()
         {
-            portInput.Update();
+            PortInput.Update();
             base.Update();
         }
 
@@ -33,7 +34,7 @@ namespace WindowsGame1.Menus
         {
             base.Draw(spriteBatch);
 
-            portInput.Draw(spriteBatch);
+            PortInput.Draw(spriteBatch);
             
         }
     }

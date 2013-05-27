@@ -14,7 +14,7 @@ namespace WindowsGame1.Menus
         public NetworkMenuClientWaiting(Texture2D snakePic, SpriteFont customFont, Vector2 startPosition)
             : base(snakePic, customFont,startPosition, GameState.NETWORK_MENU_WAITING_FOR_SERVER)
         {
-            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (HEIGHT + 5), WIDTH, HEIGHT), GameState.DISCONNECT_CLIENT));
+            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), GameState.DISCONNECT_CLIENT));
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)

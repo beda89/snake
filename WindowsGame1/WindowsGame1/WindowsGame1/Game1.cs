@@ -46,6 +46,8 @@ namespace WindowsGame1
     ///
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        #region fields
+        //TopBound of the gameField (space above is used for current score)
         private const int TOPBOUND_Y = 32;
 
         private GraphicsDeviceManager graphics;
@@ -79,6 +81,8 @@ namespace WindowsGame1
         private List<Snake> snakes;
 
         Texture2D[] snakeTexture = new Texture2D[4];
+
+        #endregion
 
         public Game1()
         {
@@ -158,13 +162,13 @@ namespace WindowsGame1
             {
                 case GameState.MAIN_MENU:
                     mainMenu.Update();
-                    gameState = mainMenu.getCurrentState();
+                    gameState = mainMenu.CurrentState;
                     isClient = false;
                     break;
 
                 case GameState.NETWORK_MENU_CLIENT:
                     networkMenuClient.Update();
-                    gameState=networkMenuClient.getCurrentState();
+                    gameState = networkMenuClient.CurrentState;
                     isClient = true;
                     break;
 
@@ -175,8 +179,8 @@ namespace WindowsGame1
                         break;
                     }
 
-                    port = Convert.ToInt32(networkMenuClient.GetPort());
-                    ip = networkMenuClient.GetIP();
+                    port = Convert.ToInt32(networkMenuClient.PortInput.InputText);
+                    ip = networkMenuClient.IpInput.InputText;
 
                     client = new Client(ip,port,snakeTexture);
                     clientThread = new System.Threading.Thread(client.Start);
@@ -187,10 +191,9 @@ namespace WindowsGame1
 
                 case GameState.NETWORK_MENU_WAITING_FOR_SERVER:
                     networkMenuClientWaiting.Update();
-                    gameState = networkMenuClientWaiting.getCurrentState();
+                    gameState = networkMenuClientWaiting.CurrentState;
 
-
-                    //if gamestate of menu is waiting for Server, we have to check if the connection was refused
+                    //if gamestate of menu is "waiting for Server", we have to check if the connection was refused
                     if (gameState == GameState.NETWORK_MENU_WAITING_FOR_SERVER)
                     {
                         gameState = client.ClientGameState;
@@ -202,7 +205,7 @@ namespace WindowsGame1
 
                     try
                     {
-                        port = Convert.ToInt32(networkMenuServer.portInput.InputText);
+                        port = Convert.ToInt32(networkMenuServer.PortInput.InputText);
                     }
                     catch (FormatException)
                     {
@@ -222,17 +225,17 @@ namespace WindowsGame1
 
                 case GameState.NETWORK_MENU_WAITING_FOR_CLIENTS:
                     networkMenuServerWaiting.Update(server);
-                    gameState = networkMenuServerWaiting.getCurrentState();
+                    gameState = networkMenuServerWaiting.CurrentState;
                     break;
 
                 case GameState.CONNECTION_REFUSED:
                     networkMenuClient.Update();
-                    gameState=networkMenuClient.getCurrentState();
+                    gameState = networkMenuClient.CurrentState;
                     break;
 
                 case GameState.NETWORK_MENU_SERVER:
                     networkMenuServer.Update();
-                    gameState = networkMenuServer.getCurrentState();
+                    gameState = networkMenuServer.CurrentState;
                     break;
 
                 case GameState.FINISH_GAME:
@@ -301,6 +304,7 @@ namespace WindowsGame1
             }
 
 
+            //TODO: CATCH EXIT SIGNAL WHEN MOUSECLICKS ON CLOSE DURING PLAY
 
 
 
@@ -316,12 +320,6 @@ namespace WindowsGame1
             base.Update(gameTime);
         }
 
-
-     /*   private void UpdateSnakesClient(List<Snake> snakes)
-        {
-
-
-        } */
 
          private void UpdateSnakes(List<Snake> snakes,GameTime gameTime)
          {

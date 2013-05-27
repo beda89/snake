@@ -7,14 +7,14 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using WindowsGame1.Menus;
 
-namespace WindowsGame1
+namespace WindowsGame1.Menus.Input
 {
     class PortInputField:InputField
     {
         private const int MAX_PORT = 65535;
 
         public String InputText { get; private set; }
-        public Rectangle inputFieldSize { get; set; }
+        public Rectangle InputFieldSize { get; set; }
 
         private Vector2 position;
         private String label;
@@ -34,7 +34,7 @@ namespace WindowsGame1
             this.InputText = "";
             this.isFocused = false;
 
-            inputFieldSize = new Rectangle((int)position.X, (int)position.Y + 35, maxInput * 12 + 10, 30);
+            InputFieldSize = new Rectangle((int)position.X, (int)position.Y + 35, maxInput * 12 + 10, 30);
         }
 
         public void Update()
@@ -76,8 +76,8 @@ namespace WindowsGame1
             Texture2D pixel = new Texture2D(spriteBatch.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixel.SetData<Color>(new Color[] { backgroundColor});
 
-            spriteBatch.Draw(pixel, inputFieldSize, Color.White);
-            spriteBatch.DrawString(font,InputText,new Vector2(inputFieldSize.X+10,inputFieldSize.Y),Color.Gray);
+            spriteBatch.Draw(pixel, InputFieldSize, Color.White);
+            spriteBatch.DrawString(font,InputText,new Vector2(InputFieldSize.X+10,InputFieldSize.Y),Color.Gray);
         }
 
         public Boolean CheckPortInput()

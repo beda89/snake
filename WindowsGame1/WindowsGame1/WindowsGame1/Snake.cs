@@ -9,8 +9,10 @@ namespace WindowsGame1
 {
     class Snake
     {
+        // The time we display a frame until the next one
+        private const int FRAME_TIME = 250;
+
         public Vector2 Position;
-        private Texture2D Texture;
         public enum Direction { Up, Right, Down, Left };
 
         //the parts of the snake as a list (every snake segment)
@@ -19,8 +21,9 @@ namespace WindowsGame1
 
         // The time since we last updated the frame
         private int elapsedTime;
-        // The time we display a frame until the next one
-        private int frameTime= 250;
+
+        private Texture2D Texture;
+
 
         //only called by server
         public void Initialize(Texture2D texture, Vector2 position,Direction SnakeDirection)
@@ -68,12 +71,14 @@ namespace WindowsGame1
         //only called by server
         public void Update(GameTime gameTime,GameField gameField)
         {
+            //TODO there is a bug with the set direction if the snake collides with the borders
+
             // Update the elapsed time
             elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
 
             // If the elapsed time is larger than the frame time
             // we need to switch frames
-            if (elapsedTime > frameTime)
+            if (elapsedTime > FRAME_TIME)
             {
                 Vector2 tempPosition = Position;
 

@@ -63,7 +63,7 @@ namespace WindowsGame1
             CurrentClients.Clear();
         }
 
-        //sends startSignal to every client with snake Positions and the number of the snake according to the client
+        //sends startSignal to every client with snake Positions and the number of the snake assigned to the client
         public void sendStartSignal(List<Snake> snakes)
         {
             //player number which gets assigned to every client, starts with 1 because server is 0
@@ -78,7 +78,6 @@ namespace WindowsGame1
 
             InGameState = InGameState.RUNNING;
         }
-
 
         //sends string with current positions of every segment of every snake
         private void sendCurrentPosition(TcpClient tcpClient,List<Snake> snakes)
