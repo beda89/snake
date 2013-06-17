@@ -67,7 +67,7 @@ namespace Snake.Menus
             PortInput.Draw(spriteBatch);
         }
 
-        public Boolean CheckInputFields()
+        public Boolean InputFieldsAreValid()
         {
             if (!IpInput.CheckIpInput())
             {

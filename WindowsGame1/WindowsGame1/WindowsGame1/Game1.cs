@@ -49,6 +49,8 @@ namespace Snake
         #region fields
         //TopBound of the gameField (space above is used for current score)
         private const int TOPBOUND_Y = 32;
+        // The time we display a frame until the next one
+        private const int FRAME_TIME = 250;
 
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -78,6 +80,8 @@ namespace Snake
         private SpriteFont customFont;
 
         private Boolean isClient = false;
+        private int elapsedTime = 0;
+        private int moveCondition = 0;
 
         //server manages the snakes
         private List<Snake> snakes;
@@ -161,9 +165,6 @@ namespace Snake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            int port;
-            String ip;
-
             switch (gameState)
             {
                 case GameState.MAIN_MENU:
@@ -179,27 +180,25 @@ namespace Snake
                     break;
 
                 case GameState.CONNECT_TO_SERVER:
-                    if (!networkMenuClient.CheckInputFields())
+                    if (!networkMenuClient.InputFieldsAreValid())
                     {
+                        //if invalid input, we stay at network client menu
                         gameState = GameState.NETWORK_MENU_CLIENT;
                         break;
                     }
 
-                    port = Convert.ToInt32(networkMenuClient.PortInput.InputText);
-                    ip = networkMenuClient.IpInput.InputText;
-
-                    client = new Client(ip,port,snakeTexture);
-                    clientThread = new System.Threading.Thread(client.Start);
-                    clientThread.Start();
+                    tryConnectionToServer();
                     gameState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
 
                     break;
 
                 case GameState.NETWORK_MENU_WAITING_FOR_SERVER:
+
+                    //checking if user pressed back button before the game started
                     networkMenuClientWaiting.Update();
                     gameState = networkMenuClientWaiting.CurrentState;
 
-                    //if gamestate of menu is "waiting for Server", we have to check if the connection was refused
+                    //if gamestate of menu is still "waiting for Server", we have to check if the connection was refused
                     if (gameState == GameState.NETWORK_MENU_WAITING_FOR_SERVER)
                     {
                         gameState = client.ClientGameState;
@@ -208,25 +207,14 @@ namespace Snake
                     break;
 
                 case GameState.START_SERVER:
-
-                    try
-                    {
-                        port = Convert.ToInt32(networkMenuServer.PortInput.InputText);
-                    }
-                    catch (FormatException)
-                    {
+                    
+                    //if wrong user input we stay at the server menu
+                    if(!networkMenuServer.hasValidInput()){
                         gameState = GameState.NETWORK_MENU_SERVER;
                         break;
                     }
-                        
-                    server = new Server(port);
-                    
 
-                    //TODO check if threadStart is needed!
-                    serverThread = new System.Threading.Thread(server.Start);
-                    serverThread.Start();
-                    networkMenuServerWaiting.Update(server);
-                    gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
+                    startServer();
                     break;
 
                 case GameState.NETWORK_MENU_WAITING_FOR_CLIENTS:
@@ -267,30 +255,11 @@ namespace Snake
 
                     if (inGameState == InGameState.STARTING)
                     {
-                        //init snakes, first one is needed for server
-                        snakes = new List<Snake>();
-                        Snake snake = new Snake();
-                        snake.Initialize(snakeTexture[0], new Vector2(128f, 64f),Snake.Direction.Right);
-                        snakes.Add(snake);
-
-                        for (int i = 0; i < server.CurrentClients.Count(); i++)
-                        {
-                            snake= new Snake();
-                            snake.Initialize(snakeTexture[i+1], new Vector2(256f, 256f), Snake.Direction.Up);
-                            snakes.Add(snake);
-                        }
-                        
-                        inGameState = InGameState.RUNNING;
-
-                        server.sendStartSignal(snakes,snakeFood);
+                        initServerGame();
                     }
 
-                    snakes=server.CommunicateWithClients(snakes,snakeFood);
+                    inPlay(gameTime);
 
-                    gameLogic(snakes);
-
-                    UpdateSnakes(snakes,gameTime);
-                      
                     break;
 
                 case GameState.PLAY_CLIENT:
@@ -302,7 +271,7 @@ namespace Snake
                     snakes = client.Snakes;
                     snakeFood.Position = client.SnakeFoodPosition;
 
-                    UpdateSnakes(snakes,gameTime);
+                    updateSnakes(snakes,true);
                     break;
 
                 case GameState.EXIT:
@@ -328,42 +297,101 @@ namespace Snake
             base.Update(gameTime);
         }
 
+        //only called by the server
+        private void inPlay(GameTime gameTime)
+        {
+            // Update the elapsed time
+            elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
 
+            //we communicate with clients 2x during one frame
+            if (elapsedTime > FRAME_TIME / 2)
+            {
+                //snakes are passed by reference since we get the direction information of each snake from the clients and want to persist it
+                server.CommunicateWithClients(ref snakes, snakeFood);
+
+                //snakes are moved once during frameTime
+                updateSnakes(snakes, true);
+                gameLogic(snakes);
+
+                elapsedTime = 0;
+            }
+            else
+            {
+                updateSnakes(snakes, false);
+
+            }
+        }
+
+
+        private void initServerGame()
+        {
+            //init snakes, first one is needed for server
+            snakes = new List<Snake>();
+            Snake snake = new Snake();
+            snake.Initialize(snakeTexture[0], new Vector2(128f, 64f), Snake.Direction.Right);
+            snakes.Add(snake);
+
+            for (int i = 0; i < server.CurrentClients.Count(); i++)
+            {
+                snake = new Snake();
+                snake.Initialize(snakeTexture[i + 1], new Vector2(256f, 256f), Snake.Direction.Up);
+                snakes.Add(snake);
+            }
+
+            inGameState = InGameState.RUNNING;
+
+            //sending startsignals to all clients
+            server.sendStartSignal(snakes, snakeFood);
+        }
+
+        private void startServer()
+        {
+            Int32 port = Convert.ToInt32(networkMenuServer.PortInput.InputText);
+
+            server = new Server(port);
+
+
+            //TODO check if threadStart is needed!
+            serverThread = new System.Threading.Thread(server.Start);
+            serverThread.Start();
+            networkMenuServerWaiting.Update(server);
+            gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
+
+        }
+
+        private void tryConnectionToServer()
+        {
+            int port = Convert.ToInt32(networkMenuClient.PortInput.InputText);
+            String ip = networkMenuClient.IpInput.InputText;
+
+            client = new Client(ip, port, snakeTexture);
+            clientThread = new System.Threading.Thread(client.Start);
+            clientThread.Start();
+        }
 
         /*
-         * the whole gamelogic like eating points or enemy 
+         * contains the whole gamelogic
+         * it is all done by the server
          * 
          */
         private void gameLogic(List<Snake> snakes)
         {
+            //TODO: we only have to check collision and eating of apple every time the snakes move (they move according to frametime frameTime)
             foreach(Snake snake in snakes){
                 if(snakeFood.IsEaten(snake)){
                     snake.AddPart();
                 }
             }
-
         }
 
-         private void UpdateSnakes(List<Snake> snakes,GameTime gameTime)
+        private void updateSnakes(List<Snake> snakes,Boolean moveSnakes)
          {
-
+            //the only logic a client has, is that he sets the current direction of its snake according to the user input
             if (isClient)
             {
-                int index = 0;
-                //server snake is always the first one
-                foreach (Snake snake in snakes)
-                {
-                      if (index == client.SnakeNumber)
-                      {
-                        setDirection(snake);
-                        client.ClientSnakeDirection = snake.SnakeDirection;
-
-                     }
-
-                   // snake.Update(gameTime);
-                    index++;
-                }
-
+                Snake clientSnake = snakes.ElementAt(client.SnakeNumber);
+                setDirection(clientSnake);
+                client.ClientSnakeDirection = clientSnake.SnakeDirection;
             }
             else
             {
@@ -376,10 +404,23 @@ namespace Snake
                         setDirection(snake);
                     }
 
-                    snake.Update(gameTime,gameField);
+                    if (moveSnakes == true)
+                    {
+                        //snakes are moved every second time, since updateSnakes is called twice with movesnakes during FRAMETIME
+                        if ((moveCondition % 2 )==0)
+                        {
+                            snake.Update(gameField);
+                        }
+                    }
                     index++;
                 }
             }
+
+            if (moveSnakes == true)
+            {
+                moveCondition++;
+            }
+
         }
 
 
@@ -408,22 +449,22 @@ namespace Snake
                 {
                     gameState = GameState.DISCONNECT_SERVER;
                 }
-
-                if (client != null)
+                else if (client != null)
                 {
                     gameState = GameState.DISCONNECT_CLIENT;
                 }
-
                 return ;
-
             }else
             {
                 return;
             }
 
-            int distance = Math.Abs((int)tempDirection - (int)snake.SnakeDirection);
+
+
+            int distance = Math.Abs((int)tempDirection - (int)snake.LastMovedDirection);
             if (distance != 2)
                 snake.SnakeDirection = tempDirection;
+           
 
         }
 
@@ -473,21 +514,7 @@ namespace Snake
 
                 case GameState.PLAY_CLIENT:
                 case GameState.PLAY_SERVER:
-                    this.IsMouseVisible = false;
-
-                    if (snakeFood != null)
-                    {
-                        snakeFood.Draw(spriteBatch);
-                    }
-
-                    if(snakes!=null){
-                         foreach (Snake snake in snakes)
-                         {
-                            snake.Draw(spriteBatch);
- 
-                         }
-                         gameField.Draw(spriteBatch);
-                    }
+                    drawPlayingGame(spriteBatch);
                     break;
 
             }
@@ -496,5 +523,29 @@ namespace Snake
 
             base.Draw(gameTime);
         }
+
+        private void drawPlayingGame(SpriteBatch spriteBatch)
+        {
+            //during gameplay mouse should disappear
+            this.IsMouseVisible = false;
+
+            if (snakeFood != null)
+            {
+                snakeFood.Draw(spriteBatch);
+            }
+
+            if (snakes != null)
+            {
+                foreach (Snake snake in snakes)
+                {
+                    snake.Draw(spriteBatch);
+
+                }
+                gameField.Draw(spriteBatch);
+            }
+        }
+
     }
+
+
 }

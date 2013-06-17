@@ -88,7 +88,7 @@ namespace Snake
         }
 
         //sends current positions of every segment of every snake to every client and receives the currently snake direction of the client
-        public List<Snake> CommunicateWithClients(List<Snake> snakes,SnakeFood snakeFood)
+        public void CommunicateWithClients(ref List<Snake> snakes,SnakeFood snakeFood)
         {
             //snake with index=0 belongs to server
             int index = 1;
@@ -100,8 +100,6 @@ namespace Snake
 
                 index++;
             }
-
-            return snakes;
         }
 
         //reads message from client and sets the currentDirection of the clients Snake

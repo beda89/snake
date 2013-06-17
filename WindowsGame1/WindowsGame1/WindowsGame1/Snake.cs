@@ -9,9 +9,6 @@ namespace Snake
 {
     class Snake
     {
-        // The time we display a frame until the next one
-        private const int FRAME_TIME = 250;
-
         public Vector2 Position;
         public enum Direction { Up, Right, Down, Left };
 
@@ -19,8 +16,11 @@ namespace Snake
         public List<Vector2> parts{get;set;}
         public Direction SnakeDirection;
 
-        // The time since we last updated the frame
-        private int elapsedTime;
+
+        //last really moved direction (needed if snake directions are modified fast (fast presses of cursor) it is possible to go back on its own body)
+        //for example currentDirection is UP and the user presses direction left and then direction down fast
+        public Direction LastMovedDirection { get; set; }
+
         private Vector2 oldLastPart;
 
         private Texture2D Texture;
@@ -70,17 +70,8 @@ namespace Snake
         }
 
         //only called by server
-        public void Update(GameTime gameTime,GameField gameField)
+        public void Update(GameField gameField)
         {
-            //TODO there is a bug with the set direction if the snake collides with the borders
-
-            // Update the elapsed time
-            elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
-
-            // If the elapsed time is larger than the frame time
-            // we need to switch frames
-            if (elapsedTime > FRAME_TIME)
-            {
                 Vector2 tempPosition = Position;
 
                 switch (SnakeDirection)
@@ -104,6 +95,8 @@ namespace Snake
                     return;
                 }
 
+                LastMovedDirection = SnakeDirection;
+
                 Position = tempPosition;
 
                 oldLastPart = parts.Last();
@@ -114,19 +107,14 @@ namespace Snake
                 }
 
                 parts[0] = Position;
-                elapsedTime = 0;
 
                 if (addPart == true)
                 {
                     parts.Add(oldLastPart);
                     addPart = false;
                 }
-
-            }
         }
 
-
-        //TODO: check if instantly adding part is correct (problems when enemy snake is right behind the eating snake)
         public void AddPart()
         {
             addPart = true;

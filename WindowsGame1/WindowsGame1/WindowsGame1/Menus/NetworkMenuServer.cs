@@ -37,5 +37,19 @@ namespace Snake.Menus
             PortInput.Draw(spriteBatch);
             
         }
+
+        public Boolean hasValidInput()
+        {
+            try
+            {
+                Convert.ToInt32(PortInput.InputText);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+    
     }
 }
