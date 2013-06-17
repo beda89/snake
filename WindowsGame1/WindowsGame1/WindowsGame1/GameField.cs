@@ -48,12 +48,12 @@ namespace Snake
         }
 
         public Boolean Collides(Vector2 position){
-            if (position.X <= texture.Width || position.X > (gameFieldWidth-texture.Width))
+            if (position.X < texture.Width || position.X >= (gameFieldWidth-texture.Width))
             {
                 return true;
             }
 
-            if (position.Y <= (topBorderY+texture.Height) || position.Y > (gameFieldHeight - texture.Height))
+            if (position.Y < (topBorderY+texture.Height) || position.Y >= (gameFieldHeight - texture.Height))
             {
                 return true;
             }

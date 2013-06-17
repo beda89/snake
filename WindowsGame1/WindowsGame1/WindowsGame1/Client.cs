@@ -24,6 +24,7 @@ namespace Snake
 
         //snakeNumber assigned by server, server is always 0
         public int SnakeNumber { get; private set; }
+        public Vector2 SnakeFoodPosition {get; set;}
 
         private String ip;
         private int port;
@@ -106,14 +107,19 @@ namespace Snake
 
                 //sets the global snakes list
                 initSnakesAndSetPositions(snakePositions);
+                SnakeFoodPosition = parseSnakeFoodPosition(splittedMessage[2]);
             }
             else if (message.StartsWith("!game"))
             {
                 String[] splittedMessage=message.Split(new Char[]{' '},2);
                 String[] snakePositions = seperateSnakes(splittedMessage[1]);
 
+                SnakeFoodPosition = parseSnakeFoodPosition(splittedMessage[1]);
+
                 setSnakePositions(snakePositions);
                 sendSnakeDirection(writer);
+
+
             }
             else if (message.StartsWith("!end"))
             {
@@ -171,6 +177,26 @@ namespace Snake
             }
 
             return snakePositionStrings;
+        }
+
+        private Vector2 parseSnakeFoodPosition(String message){
+            String[] positionStrings = message.Split(new Char[] { ']' }, StringSplitOptions.RemoveEmptyEntries);
+
+            String foodPositionString = positionStrings.Last();
+
+            //split in x and y position
+            String[] positions=foodPositionString.Split(new Char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+
+            try
+            {
+                float x = Convert.ToSingle(positions[0]);
+                float y = Convert.ToSingle(positions[1]);
+                return new Vector2(x, y);
+            }
+            catch (FormatException)
+            {
+                throw new MessageException();
+            }
         }
 
         //parses the positionString according to one snake

@@ -73,6 +73,15 @@
       <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\snakeTexture4.xnb</Output>
       <Time>2013-05-26T22:24:03.842826+02:00</Time>
     </Item>
+    <Item>
+      <Source>redApple.png</Source>
+      <Name>redApple</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Dateien\Programmieren\foop1\WindowsGame1\WindowsGame1\WindowsGame1\bin\x86\Debug\Content\redApple.xnb</Output>
+      <Time>2013-06-17T02:04:33.9589546+02:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

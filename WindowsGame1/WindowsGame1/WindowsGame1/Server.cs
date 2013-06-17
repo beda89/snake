@@ -64,7 +64,7 @@ namespace Snake
         }
 
         //sends startSignal to every client with snake Positions and the number of the snake assigned to the client
-        public void sendStartSignal(List<Snake> snakes)
+        public void sendStartSignal(List<Snake> snakes,SnakeFood snakeFoodPosition)
         {
             //player number which gets assigned to every client, starts with 1 because server is 0
             int index=1;
@@ -72,7 +72,7 @@ namespace Snake
             foreach (TcpClient tcpClient in CurrentClients)
             {
                 StreamWriter writer=new StreamWriter(tcpClient.GetStream());
-                writer.WriteLine("!start " + index + buildSnakePositionsString(snakes) + "!");
+                writer.WriteLine("!start " + index + buildSnakePositionsString(snakes) + buildFoodPositionString(snakeFoodPosition.Position)+" !");
                 writer.Flush();
             }
 
@@ -80,22 +80,22 @@ namespace Snake
         }
 
         //sends string with current positions of every segment of every snake
-        private void sendCurrentPosition(TcpClient tcpClient,List<Snake> snakes)
+        private void sendCurrentPosition(TcpClient tcpClient,List<Snake> snakes,SnakeFood snakeFoodPosition)
         {
             StreamWriter writer = new StreamWriter(tcpClient.GetStream());
-            writer.WriteLine("!game" + buildSnakePositionsString(snakes)+ "!");
+            writer.WriteLine("!game" + buildSnakePositionsString(snakes)+ buildFoodPositionString(snakeFoodPosition.Position)+ " !");
             writer.Flush();
         }
 
         //sends current positions of every segment of every snake to every client and receives the currently snake direction of the client
-        public List<Snake> CommunicateWithClients(List<Snake> snakes)
+        public List<Snake> CommunicateWithClients(List<Snake> snakes,SnakeFood snakeFood)
         {
             //snake with index=0 belongs to server
             int index = 1;
 
             foreach (TcpClient tcpClient in CurrentClients)
             {
-                sendCurrentPosition(tcpClient,snakes);
+                sendCurrentPosition(tcpClient,snakes,snakeFood);
                 snakes.ElementAt(index).SnakeDirection=receiveCurrentDirection(tcpClient);
 
                 index++;
@@ -143,7 +143,7 @@ namespace Snake
             return Snake.Direction.Down;
         }
 
-        //builds postitions String for all snakes
+        //builds postitions String for all snakes [snake1] [snake2] ....
         private String buildSnakePositionsString(List<Snake> snakes)
         {
             StringBuilder positions= new StringBuilder(" ");
@@ -155,6 +155,14 @@ namespace Snake
             }
 
             return positions.ToString();
+        }
+
+        private String buildFoodPositionString(Vector2 snakeFoodPosition)
+        {
+            StringBuilder position = new StringBuilder(" ");
+            position.Append(snakeFoodPosition.X + " " + snakeFoodPosition.Y);
+
+            return position.ToString();
         }
 
         //builds position String for given snake: [posX1 posY1 posX2 posY2 .... ]

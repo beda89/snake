@@ -21,9 +21,10 @@ namespace Snake
 
         // The time since we last updated the frame
         private int elapsedTime;
+        private Vector2 oldLastPart;
 
         private Texture2D Texture;
-
+        private Boolean addPart = false;
 
         //only called by server
         public void Initialize(Texture2D texture, Vector2 position,Direction SnakeDirection)
@@ -105,21 +106,37 @@ namespace Snake
 
                 Position = tempPosition;
 
+                oldLastPart = parts.Last();
+
                 for (int i = 0; i < parts.Count - 1; i++)
                 {
                     parts[parts.Count - 1 - i] = parts[parts.Count - 2 - i];
                 }
+
                 parts[0] = Position;
                 elapsedTime = 0;
+
+                if (addPart == true)
+                {
+                    parts.Add(oldLastPart);
+                    addPart = false;
+                }
+
             }
+        }
+
+
+        //TODO: check if instantly adding part is correct (problems when enemy snake is right behind the eating snake)
+        public void AddPart()
+        {
+            addPart = true;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             foreach (Vector2 part in parts)
             {
-                spriteBatch.Draw(Texture, part, null, Color.White, 0f,
-                    new Vector2(16, 16) , 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(Texture, part, Color.White);
             }
         }
     }

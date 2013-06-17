@@ -53,6 +53,7 @@ namespace Snake
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private GameField gameField;
+        private SnakeFood snakeFood;
         private KeyboardState currentKeyboardState;
         private GamePadState currentGamePadState;
         private Vector2 menuPosition;
@@ -73,13 +74,13 @@ namespace Snake
 
         private Texture2D snakePic;
         private Texture2D boundsTexture;
+        private Texture2D redAppleTexture;
         private SpriteFont customFont;
 
         private Boolean isClient = false;
 
         //server manages the snakes
         private List<Snake> snakes;
-
         Texture2D[] snakeTexture = new Texture2D[4];
 
         #endregion
@@ -114,6 +115,9 @@ namespace Snake
             gameField = new GameField();
             gameField.Initialize(TOPBOUND_Y, boundsTexture, graphics);
 
+            snakeFood = new SnakeFood();
+            snakeFood.Initialize(TOPBOUND_Y,redAppleTexture,graphics);
+
             //initial GameState
             gameState = GameState.MAIN_MENU;
 
@@ -133,6 +137,7 @@ namespace Snake
             customFont = Content.Load<SpriteFont>("customFont");
             snakePic = Content.Load<Texture2D>("snake-cartoon_small");
             boundsTexture = Content.Load<Texture2D>("boundsTexture");
+            redAppleTexture = Content.Load<Texture2D>("redApple");
         }
 
         /// <summary>
@@ -277,11 +282,12 @@ namespace Snake
                         
                         inGameState = InGameState.RUNNING;
 
-                        server.sendStartSignal(snakes);
+                        server.sendStartSignal(snakes,snakeFood);
                     }
 
-                    snakes=server.CommunicateWithClients(snakes);
+                    snakes=server.CommunicateWithClients(snakes,snakeFood);
 
+                    gameLogic(snakes);
 
                     UpdateSnakes(snakes,gameTime);
                       
@@ -294,6 +300,7 @@ namespace Snake
                     }
 
                     snakes = client.Snakes;
+                    snakeFood.Position = client.SnakeFoodPosition;
 
                     UpdateSnakes(snakes,gameTime);
                     break;
@@ -321,6 +328,21 @@ namespace Snake
             base.Update(gameTime);
         }
 
+
+
+        /*
+         * the whole gamelogic like eating points or enemy 
+         * 
+         */
+        private void gameLogic(List<Snake> snakes)
+        {
+            foreach(Snake snake in snakes){
+                if(snakeFood.IsEaten(snake)){
+                    snake.AddPart();
+                }
+            }
+
+        }
 
          private void UpdateSnakes(List<Snake> snakes,GameTime gameTime)
          {
@@ -452,6 +474,11 @@ namespace Snake
                 case GameState.PLAY_CLIENT:
                 case GameState.PLAY_SERVER:
                     this.IsMouseVisible = false;
+
+                    if (snakeFood != null)
+                    {
+                        snakeFood.Draw(spriteBatch);
+                    }
 
                     if(snakes!=null){
                          foreach (Snake snake in snakes)
