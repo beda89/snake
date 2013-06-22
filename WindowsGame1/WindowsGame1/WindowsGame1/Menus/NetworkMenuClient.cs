@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Snake.FSM;
 using Snake.Menus.Input;
 
 namespace Snake.Menus
@@ -21,22 +22,22 @@ namespace Snake.Menus
         public IPInputField IpInput { get; private set; }
         public PortInputField PortInput { get; private set; }
 
-        public NetworkMenuClient(Texture2D snakePic,SpriteFont customFont, Vector2 startPosition)
-            : base(snakePic,customFont,startPosition,GameState.NETWORK_MENU_CLIENT)
+        public NetworkMenuClient(Vector2 startPosition,StateBase menuState)
+            : base(startPosition,menuState)
         {
 
-            items.Add(new MenuEntry("Join Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, ITEM_WIDTH, ITEM_HEIGHT), GameState.CONNECT_TO_SERVER));
-            items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), GameState.MAIN_MENU));
+         //   items.Add(new MenuEntry("Join Server", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, ITEM_WIDTH, ITEM_HEIGHT), GameState.CONNECT_TO_SERVER));
+            items.Add(new MenuEntry("Back", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), new MainMenu_State(startPosition)));
 
-            IpInput = new IPInputField("IP-Address:", new Vector2(startPosition.X, INPUT_FIELD_Y), base.font, Color.Black, MAX_IP_LENGTH);
-            PortInput = new PortInputField("Port:", new Vector2(startPosition.X, INPUT_FIELD_Y + Y_SPACING), base.font, Color.Black, MAX_PORT_LENGTH);
+            IpInput = new IPInputField("IP-Address:", new Vector2(startPosition.X, INPUT_FIELD_Y), Color.Black, MAX_IP_LENGTH);
+            PortInput = new PortInputField("Port:", new Vector2(startPosition.X, INPUT_FIELD_Y + Y_SPACING), Color.Black, MAX_PORT_LENGTH);
 
             IpInput.Focus();
         }
 
-        public override void Update()
+        public override void Update(Context context)
         {
-            base.Update();
+            base.Update(context);
 
             MouseState state = Mouse.GetState();
             Rectangle mousePosition=new Rectangle(state.X,state.Y,1,1);
@@ -60,11 +61,11 @@ namespace Snake.Menus
         }
 
 
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch,Texture2D snakePic,SpriteFont font)
         {
-            base.Draw(spriteBatch);
-            IpInput.Draw(spriteBatch);
-            PortInput.Draw(spriteBatch);
+            base.Draw(spriteBatch,snakePic,font);
+            IpInput.Draw(spriteBatch,font);
+            PortInput.Draw(spriteBatch,font);
         }
 
         public Boolean InputFieldsAreValid()

@@ -11,11 +11,12 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Snake.FSM;
 using Snake.Menus;
 
 namespace Snake
 {
-
+    /*
     public enum GameState { MAIN_MENU, 
                             NETWORK_MENU_SERVER, 
                             NETWORK_MENU_CLIENT, 
@@ -29,7 +30,7 @@ namespace Snake
                             DISCONNECT_SERVER,
                             DISCONNECT_CLIENT,
                             CONNECTION_REFUSED,
-                            EXIT };
+                            EXIT }; */
 
     public enum InGameState
     {
@@ -62,8 +63,11 @@ namespace Snake
         private Thread serverThread;
         private Thread clientThread;
 
-        private GameState gameState;
-        private InGameState inGameState;
+        //FSM
+        private Context context;
+
+      /*  private GameState gameState;
+        private InGameState inGameState; */
 
         private Menu mainMenu;
         private NetworkMenuServer networkMenuServer;
@@ -110,11 +114,11 @@ namespace Snake
             menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            mainMenu = new MainMenu(snakePic, customFont, menuPosition);
+        /*    mainMenu = new MainMenu(menuPosition);
             networkMenuServer = new NetworkMenuServer(snakePic, customFont, menuPosition);
             networkMenuClient = new NetworkMenuClient(snakePic, customFont, menuPosition);
             networkMenuClientWaiting = new NetworkMenuClientWaiting(snakePic, customFont, menuPosition);
-            networkMenuServerWaiting = new NetworkMenuServerWaiting(snakePic, customFont, menuPosition);
+            networkMenuServerWaiting = new NetworkMenuServerWaiting(snakePic, customFont, menuPosition); */
 
             gameField = new GameField();
             gameField.Initialize(TOPBOUND_Y, boundsTexture, graphics);
@@ -122,9 +126,11 @@ namespace Snake
             snakeFood = new SnakeFood();
             snakeFood.Initialize(TOPBOUND_Y,redAppleTexture,graphics);
 
-            //initial GameState
-            gameState = GameState.MAIN_MENU;
 
+
+
+            //initial State
+            context = new Context(new MainMenu_State(menuPosition),snakePic,customFont);
         }
 
         /// <summary>
@@ -156,6 +162,7 @@ namespace Snake
             snakeTexture[3].Dispose();
             boundsTexture.Dispose();
             snakePic.Dispose();
+            redAppleTexture.Dispose();
         }
 
         /// <summary>
@@ -165,6 +172,10 @@ namespace Snake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            context.Update();
+
+            /*
             switch (gameState)
             {
                 case GameState.MAIN_MENU:
@@ -279,7 +290,7 @@ namespace Snake
                     this.Exit();
                     break;
             }
-
+            */
 
             //TODO: CATCH EXIT SIGNAL WHEN MOUSECLICKS ON CLOSE DURING PLAY
 
@@ -338,7 +349,7 @@ namespace Snake
                 snakes.Add(snake);
             }
 
-            inGameState = InGameState.RUNNING;
+       //     inGameState = InGameState.RUNNING;
 
             //sending startsignals to all clients
             server.sendStartSignal(snakes, snakeFood);
@@ -354,8 +365,8 @@ namespace Snake
             //TODO check if threadStart is needed!
             serverThread = new System.Threading.Thread(server.Start);
             serverThread.Start();
-            networkMenuServerWaiting.Update(server);
-            gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
+         //   networkMenuServerWaiting.Update(server);
+        //    gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
 
         }
 
@@ -447,11 +458,11 @@ namespace Snake
             {
                 if (server != null)
                 {
-                    gameState = GameState.DISCONNECT_SERVER;
+             //       gameState = GameState.DISCONNECT_SERVER;
                 }
                 else if (client != null)
                 {
-                    gameState = GameState.DISCONNECT_CLIENT;
+             //       gameState = GameState.DISCONNECT_CLIENT;
                 }
                 return ;
             }else
@@ -481,8 +492,12 @@ namespace Snake
             GraphicsDevice.Clear(Color.White);
             spriteBatch.Begin();
 
-            this.IsMouseVisible = true;
+            //this.IsMouseVisible = true;
 
+            context.Draw(spriteBatch);
+
+
+            /*
             switch (gameState)
             {
                 case GameState.MAIN_MENU:
@@ -517,7 +532,7 @@ namespace Snake
                     drawPlayingGame(spriteBatch);
                     break;
 
-            }
+            } */
 
             spriteBatch.End();
 

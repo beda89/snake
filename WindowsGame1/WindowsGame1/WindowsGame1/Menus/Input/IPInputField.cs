@@ -20,17 +20,15 @@ namespace Snake.Menus.Input
             private Keys lastKey = Keys.None;
             private Vector2 position;
             private String label;
-            private SpriteFont font;
             private Color txtColor;
             private int maxInput;
 
             #endregion
 
-            public IPInputField(String label, Vector2 position, SpriteFont font, Color txtColor, int maxInputLength):base()
+            public IPInputField(String label, Vector2 position, Color txtColor, int maxInputLength):base()
             {
                 this.position = position;
                 this.label = label;
-                this.font = font;
                 this.txtColor = txtColor;
                 this.maxInput = maxInputLength;
                 this.backgroundColor = Color.LightGray;
@@ -75,7 +73,7 @@ namespace Snake.Menus.Input
                 }
             }
 
-            public void Draw(SpriteBatch spriteBatch)
+            public void Draw(SpriteBatch spriteBatch,SpriteFont font)
             {
                 spriteBatch.DrawString(font, label, position, txtColor);
 

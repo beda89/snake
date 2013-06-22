@@ -88,6 +88,16 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="Exceptions\MessageException.cs" />
+    <Compile Include="FSM\ClientPlaying_State.cs" />
+    <Compile Include="FSM\Context.cs" />
+    <Compile Include="FSM\Exit_State.cs" />
+    <Compile Include="FSM\MainMenu_State.cs" />
+    <Compile Include="FSM\NetworkMenuServerWaiting_State.cs" />
+    <Compile Include="FSM\NetworkMenuClientWaiting_State.cs" />
+    <Compile Include="FSM\NetworkMenuClient_State.cs" />
+    <Compile Include="FSM\NetworkMenuServer_State.cs" />
+    <Compile Include="FSM\ServerPlaying_State.cs" />
+    <Compile Include="FSM\StateBase.cs" />
     <Compile Include="GameField.cs" />
     <Compile Include="Menus\Input\InputField.cs" />
     <Compile Include="Menus\Input\PortInputField.cs" />

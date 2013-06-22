@@ -17,7 +17,7 @@ namespace Snake
 
         //every snake in play(are initialized and managed by server)
         public List<Snake> Snakes { get; set; }
-        public GameState ClientGameState { get; private set; }
+     //   public GameState ClientGameState { get; private set; }
 
         //states while playing
         public InGameState InGameState{get;set;} 
@@ -37,7 +37,7 @@ namespace Snake
         {
             
             this.InGameState = InGameState.STARTING;
-            this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
+        //    this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
             this.ip = ipString;
             this.port = port;
             this.snakeTexture = texture;
@@ -69,7 +69,7 @@ namespace Snake
             }
             catch (SocketException)
             {
-                ClientGameState = GameState.CONNECTION_REFUSED;
+               // ClientGameState = GameState.CONNECTION_REFUSED;
             }
         } 
 
@@ -98,7 +98,7 @@ namespace Snake
             {
                 String[] splittedMessage = message.Split(new Char[]{' '}, 3);
 
-                ClientGameState = GameState.PLAY_CLIENT;
+             //   ClientGameState = GameState.PLAY_CLIENT;
                 InGameState = InGameState.STARTING;
 
                 SnakeNumber = Convert.ToInt32(splittedMessage[1]);

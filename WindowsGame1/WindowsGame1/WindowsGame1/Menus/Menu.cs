@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Snake.FSM;
 
 namespace Snake.Menus
 {
@@ -17,13 +18,15 @@ namespace Snake.Menus
 
         #region fields
 
-        private GameState currentState;
-        public GameState CurrentState
+
+        //TODO refactor
+        private StateBase currentState;
+        public StateBase CurrentState
         {
             get
             {
                 //currentState is set back to the standardMenu state,if user comes back to this menu
-                GameState temp = currentState;
+                StateBase temp = currentState;
                 currentState = standardState;
                 return temp;
             }
@@ -32,47 +35,40 @@ namespace Snake.Menus
         }
 
         protected List<MenuEntry> items;
-        protected SpriteFont font;
-        protected GameState standardState;
+        protected StateBase standardState;
         protected Vector2 startPosition;
 
         private MouseState oldMouseState;
         private MouseState currentMouseState;
-        private Texture2D snakePic;
         private Rectangle snakePosition;
 
         #endregion
 
-        public Menu(Texture2D snakePic, SpriteFont font,Vector2 startPosition, GameState standardState)
+        public Menu(Vector2 startPosition, StateBase standardState)
         {
-            this.font = font;
-            this.snakePic = snakePic;
             this.startPosition = startPosition;
-
-            this.snakePosition = new Rectangle(400, 50, snakePic.Width, snakePic.Height);
             this.standardState = standardState;
             this.currentState = standardState;
             this.items = new List<MenuEntry>();
         }
 
-        public virtual void Update()
+        public virtual void Update(Context context)
         {
             oldMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
             Rectangle mousePosition = new Rectangle(currentMouseState.X, currentMouseState.Y, 1, 1);
 
+            //check every menuEntry if it's clicked or hovered
             foreach (MenuEntry entry in items)
             {
-
                 //checks if menu is clicked
                 if (currentMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (entry.Position.Intersects(mousePosition))
                     {
-                        CurrentState = entry.Gamestate;
+                        context.State = entry.Gamestate;
                     }
                 }
-
 
                 //hover effect
                 if (entry.Position.Intersects(mousePosition))
@@ -86,8 +82,9 @@ namespace Snake.Menus
             }
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch,Texture2D snakePic, SpriteFont font)
         {
+            snakePosition = new Rectangle(400, 50, snakePic.Width, snakePic.Height);
             spriteBatch.Draw(snakePic, snakePosition, Color.White);
 
             foreach (MenuEntry entry in items)
