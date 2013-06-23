@@ -37,6 +37,7 @@ namespace Snake
         {
             
             this.InGameState = InGameState.STARTING;
+            //TODO: refactor (client gamestate shouldn't be necessary)
             this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
             this.ip = ipString;
             this.port = port;
@@ -56,20 +57,26 @@ namespace Snake
 
                 StreamReader reader = new StreamReader(stream);
                 StreamWriter writer = new StreamWriter(stream);
-                String message="";
+                String message = "";
 
-                while(message!=null && !message.StartsWith("!end")){
+                while (message != null && !message.StartsWith("!end"))
+                {
                     message = reader.ReadLine();
 
-                    if(message!=null){
+                    if (message != null)
+                    {
                         communicationProtocol(message, writer);
                     }
-               }
+                }
 
             }
             catch (SocketException)
             {
-                ClientGameState = GameState.CONNECTION_REFUSED;
+                ClientGameState = GameState.DISCONNECT_CLIENT;
+            }
+            catch (IOException)
+            {
+                ClientGameState = GameState.DISCONNECT_CLIENT;
             }
         } 
 
@@ -138,7 +145,9 @@ namespace Snake
                 List<Vector2> parts = parsePositionString(snakePositionStrings[i]);
 
                 Snake snake = new Snake();
-                snake.Initialize(snakeTexture[snakeIndex], parts);
+
+                //TODO: change priority
+                snake.Initialize(snakeTexture[snakeIndex], parts.ElementAt(0), parts.GetRange(1, parts.Count - 1), i, Color.FromNonPremultiplied(0xFF, 0x41, 0xD8, 0x24));
                 Snakes.Add(snake);
                 snakeIndex++;
             }
@@ -153,7 +162,17 @@ namespace Snake
             {
                 List<Vector2> parts = parsePositionString(snakePositionStrings[i]);
 
-                Snakes.ElementAt(snakeIndex).parts = parts;
+                //if snake is gameOver server sends position [0 0]
+                if (parts.ElementAt(0).Equals(new Vector2(0, 0)))
+                {
+                    Snakes.ElementAt(snakeIndex).IsGameOver = true;
+                }
+                else
+                {
+                    Snakes.ElementAt(snakeIndex).Head = parts.First();
+                    Snakes.ElementAt(snakeIndex).Body = parts.GetRange(1,parts.Count()-1);
+                }
+                
                 snakeIndex++;
             }
         }

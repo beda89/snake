@@ -11,9 +11,13 @@ namespace Snake.Menus
 {
     class Menu
     {
+
+        #region constants
         protected const int ITEM_HEIGHT = 30;
         protected const int ITEM_WIDTH = 150;
         protected const int ITEM_SPACING_Y = 5;
+
+        #endregion
 
         #region fields
 

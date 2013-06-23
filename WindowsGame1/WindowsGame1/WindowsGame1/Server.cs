@@ -32,7 +32,16 @@ namespace Snake
         }
 
         public void Start(){
-            tcpListener.Start();
+
+            try
+            {
+                tcpListener.Start();
+            }
+            catch (SocketException)
+            {
+                return;
+            }
+
 
             while (CurrentClients.Count()<MAX_PLAYERS)
             {
@@ -96,7 +105,15 @@ namespace Snake
             foreach (TcpClient tcpClient in CurrentClients)
             {
                 sendCurrentPosition(tcpClient,snakes,snakeFood);
-                snakes.ElementAt(index).SnakeDirection=receiveCurrentDirection(tcpClient);
+
+                Snake.Direction snakeDirection = receiveCurrentDirection(tcpClient);
+                Snake snake=snakes.ElementAt(index);
+
+                //client sends direction and server checks if valid
+                if (GameUtils.IsDirectionValid(snake, snakeDirection))
+                {
+                    snakes.ElementAt(index).SnakeDirection = snakeDirection;
+                }
 
                 index++;
             }
@@ -168,13 +185,21 @@ namespace Snake
         {
             StringBuilder positions = new StringBuilder("[");
 
-            foreach (Vector2 part in snake.parts)
+            if (snake.IsGameOver)
             {
-                positions.Append(part.X + " " + part.Y + " ");
+                positions.Append("0 0");
             }
+            else
+            {
+                positions.Append(snake.Head.X + " " +snake.Head.Y + " ");
 
-            positions=positions.Remove(positions.Length - 1,1);
+                foreach (Vector2 part in snake.Body)
+                {
+                    positions.Append(part.X + " " + part.Y + " ");
+                }
 
+                positions = positions.Remove(positions.Length - 1, 1);
+            }
             positions.Append("]");
 
             return positions.ToString();

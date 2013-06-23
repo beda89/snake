@@ -9,11 +9,6 @@ namespace Snake
 {
     class SnakeFood
     {
-        private const int PLAY_FIELD_X_START = 1;
-        private const int PLAY_FIELD_X_END = 16;
-        private const int PLAY_FIELD_Y_START=3;
-        private const int PLAY_FIELD_Y_END = 16;
-
         public Vector2 Position { get; set; }
         private Texture2D snakeFoodTexture;
         private int gameFieldWidth;
@@ -23,8 +18,6 @@ namespace Snake
         public void Initialize(int topGameFieldBound,Texture2D snakeFoodTexture,GraphicsDeviceManager graphics)
         {
             this.snakeFoodTexture = snakeFoodTexture;
-
-
             this.gameFieldWidth = graphics.GraphicsDevice.Viewport.Width;
             this.gameFieldHeight = graphics.GraphicsDevice.Viewport.Height;
             this.topGameFieldBound = topGameFieldBound;
@@ -36,7 +29,7 @@ namespace Snake
 
         public Boolean IsEaten(Snake snake)
         {
-            if (snake.parts.First().Equals(Position))
+            if (snake.Head.Equals(Position))
             {
                 Position = generateNewPosition();
                 return true;

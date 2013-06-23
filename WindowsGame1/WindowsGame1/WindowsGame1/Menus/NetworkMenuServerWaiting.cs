@@ -25,10 +25,11 @@ namespace Snake.Menus
         {
             if (server.CurrentClients.Count() != clientList.Count())
             {
+                clientList = new List<String>();
+
                 //TODO: use table to represent joined clients
                 foreach (TcpClient client in server.CurrentClients)
                 {
-                    clientList = new List<String>();
                     clientList.Add(client.ToString());
                 }
             }

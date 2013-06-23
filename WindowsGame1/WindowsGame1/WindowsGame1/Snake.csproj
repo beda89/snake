@@ -89,6 +89,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="Exceptions\MessageException.cs" />
     <Compile Include="GameField.cs" />
+    <Compile Include="GameUtils.cs" />
     <Compile Include="Menus\Input\InputField.cs" />
     <Compile Include="Menus\Input\PortInputField.cs" />
     <Compile Include="Menus\Input\IPInputField.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Menus\NetworkMenuClientWaiting.cs" />
     <Compile Include="Menus\NetworkMenuServer.cs" />
     <Compile Include="Menus\NetworkMenuServerWaiting.cs" />
+    <Compile Include="Score.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Snake.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
