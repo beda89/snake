@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Snake.Menus
 {
-    class Menu
+    abstract class Menu
     {
 
         #region constants

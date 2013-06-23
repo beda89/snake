@@ -8,7 +8,6 @@ namespace Snake
 {
     class GameUtils
     {
-
         public static Boolean IsDirectionValid(Snake snake, Snake.Direction direction)
         {
             int distance = Math.Abs((int)direction - (int)snake.LastMovedDirection);

@@ -19,8 +19,6 @@ namespace Snake
             this.customFont = customFont;
         }
 
-
-
         public void Draw(SpriteBatch spriteBatch,List<Snake> snakes,int playerNumber)
         {
             Snake player=null;

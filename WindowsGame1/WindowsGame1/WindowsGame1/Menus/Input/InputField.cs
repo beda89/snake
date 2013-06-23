@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Snake.Menus.Input
 {
-    class InputField
+    abstract class InputField
     {
         protected Color backgroundColor;
 

@@ -16,7 +16,7 @@ namespace Snake.Menus
         private const int INPUT_FIELD_Y = 100;
         private const int Y_SPACING = 70;
         private const int MAX_IP_LENGTH = 15;
-        private const int MAX_PORT_LENGTH = 6;
+        private const int MAX_PORT_LENGTH = 5;
 
         public IPInputField IpInput { get; private set; }
         public PortInputField PortInput { get; private set; }
@@ -60,7 +60,7 @@ namespace Snake.Menus
         }
 
 
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
             IpInput.Draw(spriteBatch);

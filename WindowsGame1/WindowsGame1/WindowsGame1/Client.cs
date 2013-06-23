@@ -14,6 +14,7 @@ namespace Snake
     class Client
     {
         public Snake.Direction ClientSnakeDirection { get; set; }
+        private List<Color> snakeColors=new List<Color>();
 
         //every snake in play(are initialized and managed by server)
         public List<Snake> Snakes { get; set; }
@@ -47,6 +48,12 @@ namespace Snake
            ClientSnakeDirection = Snake.Direction.Left;
 
            Snakes = new List<Snake>();
+
+           snakeColors.Add(Color.FromNonPremultiplied(81, 220, 50, 255));
+           snakeColors.Add(Color.FromNonPremultiplied(176, 61, 201, 255));
+           snakeColors.Add(Color.FromNonPremultiplied(253, 162, 4, 255));
+           snakeColors.Add(Color.FromNonPremultiplied(240, 255, 5, 255));
+
         }
 
         public void Start(){
@@ -146,8 +153,8 @@ namespace Snake
 
                 Snake snake = new Snake();
 
-                //TODO: change priority
-                snake.Initialize(snakeTexture[snakeIndex], parts.ElementAt(0), parts.GetRange(1, parts.Count - 1), i, Color.FromNonPremultiplied(0xFF, 0x41, 0xD8, 0x24));
+                //TODO: change priority                     
+                snake.Initialize(snakeTexture[snakeIndex], parts.ElementAt(0), parts.GetRange(1, parts.Count - 1), i, snakeColors.ElementAt(i));
                 Snakes.Add(snake);
                 snakeIndex++;
             }

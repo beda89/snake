@@ -34,10 +34,8 @@ namespace Snake
 
     public enum InGameState
     {
-        WAITING,
         STARTING,
         RUNNING,
-        END
     };
 
 
@@ -336,7 +334,7 @@ namespace Snake
 
                 try
                 {
-                    server.CommunicateWithClients(ref snakes, snakeFood);
+                    server.CommunicateWithClients(snakes, snakeFood);
                 }
                 catch (MessageException)
                 {
@@ -394,7 +392,6 @@ namespace Snake
                 snake = new Snake();
                 snake.Initialize(snakeTexture[3], new Vector2(512f, 256f), Snake.Direction.Left, 3, Color.FromNonPremultiplied(240, 255, 5, 255));
                 snakes.Add(snake);
-
             }
 
             inGameState = InGameState.RUNNING;
@@ -706,6 +703,4 @@ namespace Snake
         }
     
     }
-
-
 }
