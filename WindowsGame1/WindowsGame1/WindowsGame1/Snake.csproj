@@ -88,7 +88,11 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="Exceptions\MessageException.cs" />
+    <Compile Include="FSM\Context.cs" />
+    <Compile Include="FSM\StateBase.cs" />
+    <Compile Include="FSM\State_MainMenu.cs" />
     <Compile Include="GameField.cs" />
+    <Compile Include="GameGraphics.cs" />
     <Compile Include="GameUtils.cs" />
     <Compile Include="Menus\Input\InputField.cs" />
     <Compile Include="Menus\Input\PortInputField.cs" />

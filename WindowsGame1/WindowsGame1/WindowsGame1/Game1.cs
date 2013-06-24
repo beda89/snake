@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Snake.Exceptions;
+using Snake.FSM;
 using Snake.Menus;
 
 namespace Snake
@@ -59,7 +60,6 @@ namespace Snake
         private GameField gameField;
         private SnakeFood snakeFood;
         private KeyboardState currentKeyboardState;
-        private GamePadState currentGamePadState;
         private Vector2 menuPosition;
         private Thread serverThread;
         private Thread clientThread;
@@ -76,20 +76,17 @@ namespace Snake
         private Server server;
         private Client client;
 
-        private Texture2D snakePic;
-        private Texture2D boundsTexture;
-        private Texture2D redAppleTexture;
-        private SpriteFont customFont;
+        private Context context;
 
         private Boolean isClient = false;
         private int elapsedTime = 0;
         private int moveCondition = 0;
         private int moveCounter = 0;
 
+        private GameGraphics gameGraphics;
+
         //server manages the snakes
         private List<Snake> snakes;
-        Texture2D[] snakeTexture = new Texture2D[4];
-        Texture2D[][] snakeHeads = new Texture2D[4][];
 
         private Score score;
 
@@ -141,22 +138,26 @@ namespace Snake
             menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            mainMenu = new MainMenu(snakePic, customFont, menuPosition);
-            networkMenuServer = new NetworkMenuServer(snakePic, customFont, menuPosition);
-            networkMenuClient = new NetworkMenuClient(snakePic, customFont, menuPosition);
-            networkMenuClientWaiting = new NetworkMenuClientWaiting(snakePic, customFont, menuPosition);
-            networkMenuServerWaiting = new NetworkMenuServerWaiting(snakePic, customFont, menuPosition);
+            mainMenu = new MainMenu(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
+            networkMenuServer = new NetworkMenuServer(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
+            networkMenuClient = new NetworkMenuClient(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
+            networkMenuClientWaiting = new NetworkMenuClientWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
+            networkMenuServerWaiting = new NetworkMenuServerWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
 
             gameField = new GameField();
-            gameField.Initialize(TOPBOUND_Y, boundsTexture, graphics);
+            gameField.Initialize(TOPBOUND_Y, gameGraphics.BoundsTexture, graphics);
 
             snakeFood = new SnakeFood();
-            snakeFood.Initialize(TOPBOUND_Y,redAppleTexture,graphics);
+            snakeFood.Initialize(TOPBOUND_Y, gameGraphics.RedAppleTexture, graphics);
 
-            score=new Score(customFont);
+            score = new Score(gameGraphics.CustomFont);
+
+            context = new Context(new State_MainMenu());
 
             //initial GameState
             gameState = GameState.MAIN_MENU;
+
+
 
         }
 
@@ -166,6 +167,14 @@ namespace Snake
         /// </summary>
         protected override void LoadContent()
         {
+            //all textures are stored in GameGraphics object
+            Texture2D snakePic;
+            Texture2D boundsTexture;
+            Texture2D redAppleTexture;
+            SpriteFont customFont;
+            Texture2D[] snakeTexture = new Texture2D[4];
+            Texture2D[][] snakeHeads = new Texture2D[4][];
+
             snakeTexture[0] = Content.Load<Texture2D>("snakeTexture1");
             snakeTexture[1] = Content.Load<Texture2D>("snakeTexture2");
             snakeTexture[2] = Content.Load<Texture2D>("snakeTexture3");
@@ -200,7 +209,7 @@ namespace Snake
             snakeHeads[3][2] = Content.Load<Texture2D>("snakeTexture4HeadLeft");
             snakeHeads[3][3] = Content.Load<Texture2D>("snakeTexture4HeadRight");
 
-
+            gameGraphics = new GameGraphics(customFont, snakeTexture, snakePic, boundsTexture, redAppleTexture,snakeHeads);
         }
 
         /// <summary>
@@ -209,12 +218,7 @@ namespace Snake
         /// </summary>
         protected override void UnloadContent()
         {
-            snakeTexture[0].Dispose();
-            snakeTexture[1].Dispose();
-            snakeTexture[2].Dispose();
-            snakeTexture[3].Dispose();
-            boundsTexture.Dispose();
-            snakePic.Dispose();
+            gameGraphics.Dispose();
         }
 
         /// <summary>
@@ -394,7 +398,7 @@ namespace Snake
             //ColorTranslator;
 
             //TODO: change priority
-            snake.Initialize(snakeTexture[0],snakeHeads[0], new Vector2(128f, 64f), Snake.Direction.Right, 1, Color.FromNonPremultiplied(81, 220, 50, 255));
+            snake.Initialize(gameGraphics.SnakeTexture[0],gameGraphics.SnakeHeads[0], new Vector2(128f, 64f), Snake.Direction.Right, 1, Color.FromNonPremultiplied(81, 220, 50, 255));
             snakes.Add(snake);
 
             //TODO has to be changed for more than 2 players (player 3 and 4 would start at same position as player 2
@@ -405,21 +409,21 @@ namespace Snake
             {
                 snake = new Snake();
                 //TODO change priority
-                snake.Initialize(snakeTexture[1],snakeHeads[1], new Vector2(256f, 256f), Snake.Direction.Right, 2, Color.FromNonPremultiplied(176, 61, 201, 255));
+                snake.Initialize(gameGraphics.SnakeTexture[1],gameGraphics.SnakeHeads[1], new Vector2(256f, 256f), Snake.Direction.Right, 2, Color.FromNonPremultiplied(176, 61, 201, 255));
                 snakes.Add(snake);
             }
 
             if (clientsCount >= 2)
             {
                 snake = new Snake();
-                snake.Initialize(snakeTexture[2],snakeHeads[2], new Vector2(512f, 128f), Snake.Direction.Right, 3, Color.FromNonPremultiplied(253, 162, 4, 255));
+                snake.Initialize(gameGraphics.SnakeTexture[2],gameGraphics.SnakeHeads[2], new Vector2(512f, 128f), Snake.Direction.Right, 3, Color.FromNonPremultiplied(253, 162, 4, 255));
                 snakes.Add(snake);
             }
 
             if (clientsCount == 3)
             {
                 snake = new Snake();
-                snake.Initialize(snakeTexture[3],snakeHeads[3], new Vector2(512f, 256f), Snake.Direction.Up, 4, Color.FromNonPremultiplied(240, 255, 5, 255));
+                snake.Initialize(gameGraphics.SnakeTexture[3],gameGraphics.SnakeHeads[3], new Vector2(512f, 256f), Snake.Direction.Up, 4, Color.FromNonPremultiplied(240, 255, 5, 255));
                 snakes.Add(snake);
             }
 
@@ -448,7 +452,7 @@ namespace Snake
             int port = Convert.ToInt32(networkMenuClient.PortInput.InputText);
             String ip = networkMenuClient.IpInput.InputText;
 
-            client = new Client(ip, port, snakeTexture,snakeHeads);
+            client = new Client(ip, port, gameGraphics.SnakeTexture,gameGraphics.SnakeHeads);
             clientThread = new System.Threading.Thread(client.Start);
             clientThread.Start();
         }
@@ -555,19 +559,19 @@ namespace Snake
         private void setDirection(Snake snake){
              Snake.Direction tempDirection;
 
-            if (currentKeyboardState.IsKeyDown(Keys.Left) || currentGamePadState.DPad.Left == ButtonState.Pressed)
+            if (currentKeyboardState.IsKeyDown(Keys.Left))
             {
                 tempDirection = Snake.Direction.Left;
             }
-            else if (currentKeyboardState.IsKeyDown(Keys.Right) || currentGamePadState.DPad.Right == ButtonState.Pressed)
+            else if (currentKeyboardState.IsKeyDown(Keys.Right))
             {
                 tempDirection = Snake.Direction.Right;
             }
-            else if (currentKeyboardState.IsKeyDown(Keys.Up) || currentGamePadState.DPad.Up == ButtonState.Pressed)
+            else if (currentKeyboardState.IsKeyDown(Keys.Up))
             {
                 tempDirection = Snake.Direction.Up;
             }
-            else if (currentKeyboardState.IsKeyDown(Keys.Down) || currentGamePadState.DPad.Down == ButtonState.Pressed)
+            else if (currentKeyboardState.IsKeyDown(Keys.Down))
             {
                 tempDirection = Snake.Direction.Down;
             }
@@ -610,7 +614,7 @@ namespace Snake
         {
             GraphicsDevice.Clear(Color.White);
             spriteBatch.Begin();
-
+            
             this.IsMouseVisible = true;
 
             switch (gameState)
@@ -648,8 +652,8 @@ namespace Snake
                     break;
 
             }
-
-            spriteBatch.End();
+            
+            spriteBatch.End(); 
 
             base.Draw(gameTime);
         }
