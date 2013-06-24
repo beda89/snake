@@ -64,14 +64,14 @@ namespace Snake
         private Thread serverThread;
         private Thread clientThread;
 
-        private GameState gameState;
-        private InGameState inGameState;
+ //       private GameState gameState;
+ //       private InGameState inGameState;
 
-        private Menu mainMenu;
-        private NetworkMenuServer networkMenuServer;
-        private NetworkMenuServerWaiting networkMenuServerWaiting;
-        private NetworkMenuClient networkMenuClient;
-        private Menu networkMenuClientWaiting;
+      //  private Menu mainMenu;
+      //  private NetworkMenuServer networkMenuServer;
+      //  private NetworkMenuServerWaiting networkMenuServerWaiting;
+      //  private NetworkMenuClient networkMenuClient;
+      //  private Menu networkMenuClientWaiting;
 
         private Server server;
         private Client client;
@@ -138,11 +138,11 @@ namespace Snake
             menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            mainMenu = new MainMenu(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
+            /*mainMenu = new MainMenu(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
             networkMenuServer = new NetworkMenuServer(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
             networkMenuClient = new NetworkMenuClient(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
             networkMenuClientWaiting = new NetworkMenuClientWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
-            networkMenuServerWaiting = new NetworkMenuServerWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
+            networkMenuServerWaiting = new NetworkMenuServerWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition); */
 
             gameField = new GameField();
             gameField.Initialize(TOPBOUND_Y, gameGraphics.BoundsTexture, graphics);
@@ -152,10 +152,10 @@ namespace Snake
 
             score = new Score(gameGraphics.CustomFont);
 
-            context = new Context(new State_MainMenu());
+            context = new Context(new State_MainMenu(menuPosition));
 
             //initial GameState
-            gameState = GameState.MAIN_MENU;
+      //      gameState = GameState.MAIN_MENU;
 
 
 
@@ -228,6 +228,10 @@ namespace Snake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            context.Update(server,serverThread, client, clientThread,gameTime);
+
+
+            /*
             switch (gameState)
             {
                 case GameState.MAIN_MENU:
@@ -341,7 +345,9 @@ namespace Snake
                     //TODO clean up all resources on exit
                     this.Exit();
                     break;
-            }
+ 
+             
+            } */
 
 
             /*
@@ -355,7 +361,7 @@ namespace Snake
 
             base.Update(gameTime);
         }
-
+        /*
         //only called by the server
         private void inPlay(GameTime gameTime)
         {
@@ -432,7 +438,7 @@ namespace Snake
             //sending startsignals to all clients
             server.sendStartSignal(snakes, snakeFood);
         }
-
+        /*
         private void startServer()
         {
             Int32 port = Convert.ToInt32(networkMenuServer.PortInput.InputText);
@@ -445,17 +451,8 @@ namespace Snake
             serverThread.Start();
             networkMenuServerWaiting.Update(server);
             gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
-        }
+        } */
 
-        private void tryConnectionToServer()
-        {
-            int port = Convert.ToInt32(networkMenuClient.PortInput.InputText);
-            String ip = networkMenuClient.IpInput.InputText;
-
-            client = new Client(ip, port, gameGraphics.SnakeTexture,gameGraphics.SnakeHeads);
-            clientThread = new System.Threading.Thread(client.Start);
-            clientThread.Start();
-        }
 
         /*
          * contains the whole gamelogic
@@ -487,7 +484,7 @@ namespace Snake
                 snake.CheckIfEatenByEnemy(snakes);
             }
 
-            checkIfGameFinished(snakes);
+            //checkIfGameFinished(snakes);
 
             
 
@@ -508,6 +505,7 @@ namespace Snake
         }
 
         //TODO refactor
+        /*
         private void updateSnakes(List<Snake> snakes,Boolean moveSnakes)
          {
             //the only logic a client has, is that he sets the current direction of its snake according to the user input
@@ -555,7 +553,7 @@ namespace Snake
             }
 
         }
-
+        /*
         private void setDirection(Snake snake){
              Snake.Direction tempDirection;
 
@@ -604,7 +602,7 @@ namespace Snake
                 snake.ActualSnakeDirection = tempDirection;
             }
 
-        }
+        } */
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -612,10 +610,16 @@ namespace Snake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+
+            this.IsMouseVisible = true;
+            
             GraphicsDevice.Clear(Color.White);
+            context.Draw(spriteBatch, gameGraphics, gameTime);
+            
+            /*
             spriteBatch.Begin();
             
-            this.IsMouseVisible = true;
+
 
             switch (gameState)
             {
@@ -653,7 +657,7 @@ namespace Snake
 
             }
             
-            spriteBatch.End(); 
+            spriteBatch.End(); */
 
             base.Draw(gameTime);
         }
@@ -670,6 +674,7 @@ namespace Snake
 
             if (snakes != null)
             {
+                int index = 0;
                 foreach (Snake snake in snakes)
                 {
                     if (snake.IsGameOver)
@@ -677,8 +682,8 @@ namespace Snake
                         continue;
                     }
 
-                    snake.Draw(spriteBatch);
-
+                    snake.Draw(spriteBatch,gameGraphics,index);
+                    index++;
                 }
                 gameField.Draw(spriteBatch);
 
@@ -741,7 +746,7 @@ namespace Snake
 
 
         }
-
+        /*
         private void checkIfGameFinished(List<Snake> snakes)
         {
             int index = 0;
@@ -765,7 +770,7 @@ namespace Snake
 
                  gameState = GameState.DISCONNECT_SERVER;   
             }
-        }
+        } */
     
     }
 }

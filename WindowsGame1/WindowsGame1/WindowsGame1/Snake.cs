@@ -28,36 +28,30 @@ namespace Snake
 
         private Vector2 oldLastPart;
 
-        private Texture2D Texture;
-        private Texture2D[] heads;
         private int addParts = 0;
 
         //only called by server
-        public void Initialize(Texture2D texture,Texture2D[] heads, Vector2 position,Direction SnakeDirection,int priority,Color snakeColor)
+        public void Initialize(Vector2 position,Direction SnakeDirection,int priority,Color snakeColor)
         {
             this.Position = position;
-            this.Texture = texture;
 
             this.ActualSnakeDirection = SnakeDirection;
             this.ChoosenSnakeDirection = SnakeDirection;
             this.IsGameOver = false;
             this.Priority = priority;
             this.SnakeColor = snakeColor;
-            this.heads = heads;
 
             buildSnake();
 
         }
 
         //only called by client
-        public void Initialize(Texture2D texture,Texture2D[] heads, Vector2 head, List<Vector2> body,Direction SnakeDirection, int priority,Color snakeColor)
+        public void Initialize(Vector2 head, List<Vector2> body,Direction SnakeDirection, int priority,Color snakeColor)
         {
             this.Head = head;
             this.Body = body;
-            this.Texture = texture;
             this.Priority = priority;
             this.SnakeColor = snakeColor;
-            this.heads = heads;
             this.ChoosenSnakeDirection = SnakeDirection;
             this.ActualSnakeDirection = SnakeDirection;
         }
@@ -155,29 +149,29 @@ namespace Snake
             addParts+=numberOfParts;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics,int snakeNumber)
         {
             //Drawing head
 
             if (ActualSnakeDirection == Snake.Direction.Up)
             {
-                spriteBatch.Draw(heads[0], Head, Color.White);
+                spriteBatch.Draw(gameGraphics.SnakeHeads[snakeNumber][0], Head, Color.White);
             }else if(ActualSnakeDirection == Snake.Direction.Down){
-                 spriteBatch.Draw(heads[1], Head, Color.White);
+                spriteBatch.Draw(gameGraphics.SnakeHeads[snakeNumber][1], Head, Color.White);
             }
             else if (ActualSnakeDirection == Snake.Direction.Left)
             {
-                spriteBatch.Draw(heads[2], Head, Color.White);
+                spriteBatch.Draw(gameGraphics.SnakeHeads[snakeNumber][2], Head, Color.White);
             }
             else if (ActualSnakeDirection == Snake.Direction.Right)
             {
-                spriteBatch.Draw(heads[3], Head, Color.White);
+                spriteBatch.Draw(gameGraphics.SnakeHeads[snakeNumber][3], Head, Color.White);
             }
 
             //Drawing Body
             foreach (Vector2 part in Body)
             {
-                spriteBatch.Draw(Texture, part, Color.White);
+                spriteBatch.Draw(gameGraphics.SnakeTexture[snakeNumber], part, Color.White);
             }
         }
 

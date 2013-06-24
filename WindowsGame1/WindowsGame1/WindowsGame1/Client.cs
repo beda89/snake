@@ -31,19 +31,13 @@ namespace Snake
         private int port;
         private TcpClient tcpClient;
         private NetworkStream stream;
+ 
 
-        private Texture2D[] snakeTexture;
-        private Texture2D[][] heads;
-        
-        public Client(String ipString, int port,Texture2D[] texture,Texture2D[][] heads)
+        public Client(String ipString, int port)
         {
-            this.InGameState = InGameState.STARTING;
-            //TODO: refactor (client gamestate shouldn't be necessary)
-            this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
             this.ip = ipString;
             this.port = port;
-            this.snakeTexture = texture;
-            this.heads = heads;
+
 
            //TODO:dummy value
            ClientSnakeDirection = Snake.Direction.Left;
@@ -157,7 +151,7 @@ namespace Snake
 
                 Snake snake = new Snake();
                  
-                snake.Initialize(snakeTexture[snakeIndex],heads[snakeIndex], parts.ElementAt(0), parts.GetRange(1, parts.Count - 1),snakeDirection,priority, snakeColors.ElementAt(i));
+                snake.Initialize(parts.ElementAt(0), parts.GetRange(1, parts.Count - 1),snakeDirection,priority, snakeColors.ElementAt(i));
                 Snakes.Add(snake);
                 snakeIndex++;
             }

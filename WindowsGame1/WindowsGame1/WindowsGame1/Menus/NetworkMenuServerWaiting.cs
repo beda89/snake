@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Snake.FSM;
 
 namespace Snake.Menus
 {
@@ -13,12 +14,12 @@ namespace Snake.Menus
     {
         private List<String> clientList;
 
-        public NetworkMenuServerWaiting(Texture2D snakePic,SpriteFont customFont, Vector2 startPosition) : base(snakePic,customFont,startPosition,GameState.NETWORK_MENU_WAITING_FOR_CLIENTS)
+        public NetworkMenuServerWaiting(Vector2 startPosition,StateBase standardState,StateBase mainMenuState) : base(startPosition,standardState)
         {
             clientList= new List<String>();
 
-            items.Add(new MenuEntry("Start Game", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, ITEM_WIDTH, ITEM_HEIGHT), GameState.PLAY_SERVER));
-            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), GameState.DISCONNECT_SERVER));
+            items.Add(new MenuEntry("Start Game", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y, ITEM_WIDTH, ITEM_HEIGHT), standardState));
+            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), standardState));
         }
 
         public void Update(Server server)
@@ -27,7 +28,6 @@ namespace Snake.Menus
             {
                 clientList = new List<String>();
 
-                //TODO: use table to represent joined clients
                 foreach (TcpClient client in server.CurrentClients)
                 {
                     clientList.Add(client.ToString());
@@ -37,14 +37,12 @@ namespace Snake.Menus
             base.Update();
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics)
         {
-            int index=0;
-            foreach (string item in clientList){
-                spriteBatch.DrawString(font, item, new Vector2(10, index*30), Color.Black);
-            }
 
-            base.Draw(spriteBatch);
+            spriteBatch.DrawString(gameGraphics.CustomFont,"Enemies:"+clientList.Count(), new Vector2(50, 200), Color.Black);
+            base.Draw(spriteBatch,gameGraphics);
         }
+         
     }
 }

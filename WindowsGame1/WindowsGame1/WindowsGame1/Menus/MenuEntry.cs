@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Snake.FSM;
 
 namespace Snake.Menus
 {
@@ -12,12 +13,12 @@ namespace Snake.Menus
         public Rectangle Position { set; get; }
         public Color BackgroundColor { set; get; }
         public Color Color { set; get; }
-        public GameState Gamestate { set; get; }
+        public StateBase Gamestate { set; get; }
 
         private String text;
 
 
-        public MenuEntry(String text, Color color, Color backgroundColor, Rectangle position,GameState gameState)
+        public MenuEntry(String text, Color color, Color backgroundColor, Rectangle position,StateBase gameState)
         {
             this.text = text;
             this.Color = color;

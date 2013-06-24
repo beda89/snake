@@ -8,9 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Snake.Menus
 {
-    class NetworkMenuClientWaiting:Menu
+    class NetworkMenuClientWaiting //:Menu
     {
-
+        /*
         public NetworkMenuClientWaiting(Texture2D snakePic, SpriteFont customFont, Vector2 startPosition)
             : base(snakePic, customFont,startPosition, GameState.NETWORK_MENU_WAITING_FOR_SERVER)
         {
@@ -21,6 +21,6 @@ namespace Snake.Menus
         {
             base.Draw(spriteBatch);
             spriteBatch.DrawString(base.font, "Waiting for Server ...", new Vector2(startPosition.X+200, startPosition.Y), Color.Black);
-        }
+        } */
     }
 }

@@ -20,17 +20,15 @@ namespace Snake.Menus.Input
             private Keys lastKey = Keys.None;
             private Vector2 position;
             private String label;
-            private SpriteFont font;
             private Color txtColor;
             private int maxInput;
 
             #endregion
 
-            public IPInputField(String label, Vector2 position, SpriteFont font, Color txtColor, int maxInputLength):base()
+            public IPInputField(String label, Vector2 position, Color txtColor, int maxInputLength):base()
             {
                 this.position = position;
                 this.label = label;
-                this.font = font;
                 this.txtColor = txtColor;
                 this.maxInput = maxInputLength;
                 this.backgroundColor = Color.LightGray;
@@ -75,9 +73,9 @@ namespace Snake.Menus.Input
                 }
             }
 
-            public void Draw(SpriteBatch spriteBatch)
+            public void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics)
             {
-                spriteBatch.DrawString(font, label, position, txtColor);
+                spriteBatch.DrawString(gameGraphics.CustomFont, label, position, txtColor);
 
                 Texture2D pixel = new Texture2D(spriteBatch.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
                 pixel.SetData<Color>(new Color[] { backgroundColor });
@@ -85,7 +83,7 @@ namespace Snake.Menus.Input
 
                 spriteBatch.Draw(pixel, InputFieldPosition, Color.White);
 
-                spriteBatch.DrawString(font, InputText, new Vector2(InputFieldPosition.X + 10, InputFieldPosition.Y), Color.Gray);
+                spriteBatch.DrawString(gameGraphics.CustomFont, InputText, new Vector2(InputFieldPosition.X + 10, InputFieldPosition.Y), Color.Gray);
             }
 
             public Boolean CheckIpInput()

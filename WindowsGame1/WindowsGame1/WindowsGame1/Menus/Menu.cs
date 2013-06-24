@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Snake.FSM;
 
 namespace Snake.Menus
 {
@@ -21,39 +22,33 @@ namespace Snake.Menus
 
         #region fields
 
-        private GameState currentState;
-        public GameState CurrentState
+        
+        private StateBase currentState;
+        public StateBase CurrentState
         {
             get
             {
                 //currentState is set back to the standardMenu state,if user comes back to this menu
-                GameState temp = currentState;
+                StateBase temp = currentState;
                 currentState = standardState;
                 return temp;
             }
 
             private set{currentState=value;}
-        }
+        } 
 
         protected List<MenuEntry> items;
-        protected SpriteFont font;
-        protected GameState standardState;
+        protected StateBase standardState;
         protected Vector2 startPosition;
 
         private MouseState oldMouseState;
         private MouseState currentMouseState;
-        private Texture2D snakePic;
-        private Rectangle snakePosition;
 
         #endregion
 
-        public Menu(Texture2D snakePic, SpriteFont font,Vector2 startPosition, GameState standardState)
+        public Menu(Vector2 startPosition, StateBase standardState)
         {
-            this.font = font;
-            this.snakePic = snakePic;
             this.startPosition = startPosition;
-
-            this.snakePosition = new Rectangle(400, 50, snakePic.Width, snakePic.Height);
             this.standardState = standardState;
             this.currentState = standardState;
             this.items = new List<MenuEntry>();
@@ -90,13 +85,15 @@ namespace Snake.Menus
             }
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics)
         {
-            spriteBatch.Draw(snakePic, snakePosition, Color.White);
+            Rectangle snakePosition = new Rectangle(400, 50, gameGraphics.SnakePic.Width, gameGraphics.SnakePic.Height);
+
+            spriteBatch.Draw(gameGraphics.SnakePic, snakePosition, Color.White);
 
             foreach (MenuEntry entry in items)
             {
-                entry.Draw(spriteBatch, font);
+                entry.Draw(spriteBatch, gameGraphics.CustomFont);
             }
         }
 

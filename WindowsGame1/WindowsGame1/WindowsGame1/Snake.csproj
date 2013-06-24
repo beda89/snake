@@ -90,7 +90,12 @@
     <Compile Include="Exceptions\MessageException.cs" />
     <Compile Include="FSM\Context.cs" />
     <Compile Include="FSM\StateBase.cs" />
+    <Compile Include="FSM\State_ConnectToServer.cs" />
     <Compile Include="FSM\State_MainMenu.cs" />
+    <Compile Include="FSM\State_NetworkMenuClient.cs" />
+    <Compile Include="FSM\State_NetworkMenuServer.cs" />
+    <Compile Include="FSM\State_NetworkMenuServerWaiting.cs" />
+    <Compile Include="FSM\State_StartServer.cs" />
     <Compile Include="GameField.cs" />
     <Compile Include="GameGraphics.cs" />
     <Compile Include="GameUtils.cs" />
