@@ -17,29 +17,6 @@ using Snake.Menus;
 
 namespace Snake
 {
-    /*
-    public enum GameState { MAIN_MENU, 
-                            NETWORK_MENU_SERVER, 
-                            NETWORK_MENU_CLIENT, 
-                            NETWORK_MENU_WAITING_FOR_CLIENTS, 
-                            NETWORK_MENU_WAITING_FOR_SERVER,
-                            CONNECT_TO_SERVER,
-                            PLAY_SERVER, 
-                            PLAY_CLIENT, 
-                            FINISH_GAME,
-                            START_SERVER,
-                            DISCONNECT_SERVER,
-                            DISCONNECT_CLIENT,
-                            CONNECTION_REFUSED,
-                            EXIT };
-
-    public enum InGameState
-    {
-        STARTING,
-        RUNNING,
-    }; */
-
-
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -182,154 +159,8 @@ namespace Snake
         {
             context.Update(ref server,ref serverThread,ref client,ref clientThread,gameTime);
 
-
-            /*
-            switch (gameState)
-            {
-                case GameState.MAIN_MENU:
-                    mainMenu.Update();
-                    gameState = mainMenu.CurrentState;
-                    isClient = false;
-                    break;
-
-                case GameState.NETWORK_MENU_CLIENT:
-                    networkMenuClient.Update();
-                    gameState = networkMenuClient.CurrentState;
-                    isClient = true;
-                    break;
-
-                case GameState.CONNECT_TO_SERVER:
-                    if (!networkMenuClient.InputFieldsAreValid())
-                    {
-                        //if invalid input, we stay at network client menu
-                        gameState = GameState.NETWORK_MENU_CLIENT;
-                        break;
-                    }
-
-                    tryConnectionToServer();
-                    gameState = GameState.NETWORK_MENU_WAITING_FOR_SERVER;
-
-                    break;
-
-                case GameState.NETWORK_MENU_WAITING_FOR_SERVER:
-
-                    //checking if user pressed back button before the game started
-                    networkMenuClientWaiting.Update();
-                    gameState = networkMenuClientWaiting.CurrentState;
-
-                    //if gamestate of menu is still "waiting for Server", we have to check if the connection was refused
-                    if (gameState == GameState.NETWORK_MENU_WAITING_FOR_SERVER)
-                    {
-                        gameState = client.ClientGameState;
-                    }
-
-                    break;
-
-                case GameState.START_SERVER:
-                    
-                    //if wrong user input we stay at the server menu
-                    if(!networkMenuServer.hasValidInput()){
-                        gameState = GameState.NETWORK_MENU_SERVER;
-                        break;
-                    }
-
-                    startServer();
-                    break;
-
-                case GameState.NETWORK_MENU_WAITING_FOR_CLIENTS:
-                    networkMenuServerWaiting.Update(server);
-                    gameState = networkMenuServerWaiting.CurrentState;
-                    break;
-
-                case GameState.CONNECTION_REFUSED:
-                    networkMenuClient.Update();
-                    gameState = networkMenuClient.CurrentState;
-                    break;
-
-                case GameState.NETWORK_MENU_SERVER:
-                    networkMenuServer.Update();
-                    gameState = networkMenuServer.CurrentState;
-                    break;
-
-                case GameState.FINISH_GAME:
-                    //gameState = GameState.DISCONNECT;
-                    break;
-
-                case GameState.DISCONNECT_SERVER:
-                    server.Stop();
-                    serverThread.Abort();
-                    gameState = GameState.MAIN_MENU;
-                    server = null;
-                    break;
-
-                case GameState.DISCONNECT_CLIENT:
-                    client.Stop();
-                    clientThread.Abort();
-                    gameState = GameState.MAIN_MENU;
-                    client = null;
-                    break;
-
-                case GameState.PLAY_SERVER:
-                    inGameState = server.InGameState;
-
-                    if (inGameState == InGameState.STARTING)
-                    {
-                        initServerGame();
-                    }
-
-                    inPlay(gameTime);
-
-                    break;
-
-                case GameState.PLAY_CLIENT:
-                    if (client.InGameState == InGameState.STARTING)
-                    {
-                        client.InGameState=InGameState.RUNNING;
-                    }
-
-                    snakes = client.Snakes;
-                    snakeFood.Position = client.SnakeFoodPosition;
-
-                    updateSnakes(snakes,true);
-                    break;
-
-                case GameState.EXIT:
-                    //TODO clean up all resources on exit
-                    this.Exit();
-                    break;
- 
-             
-            } */
-
-
-            /*
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-            */
-            // Read the current state of the keyboard and gamepad and store it
-           
-           // currentGamePadState = GamePad.GetState(PlayerIndex.One);
-
             base.Update(gameTime);
         }
-
-        /*
-        private void startServer()
-        {
-            Int32 port = Convert.ToInt32(networkMenuServer.PortInput.InputText);
-
-            server = new Server(port);
-
-
-            //TODO check if threadStart is needed!
-            serverThread = new System.Threading.Thread(server.Start);
-            serverThread.Start();
-            networkMenuServerWaiting.Update(server);
-            gameState = GameState.NETWORK_MENU_WAITING_FOR_CLIENTS;
-        } */
-
-
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -337,55 +168,11 @@ namespace Snake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-
             this.IsMouseVisible = true;
             
             GraphicsDevice.Clear(Color.White);
             context.Draw(spriteBatch, gameGraphics, gameTime);
             
-            /*
-            spriteBatch.Begin();
-            
-
-
-            switch (gameState)
-            {
-                case GameState.MAIN_MENU:
-                    mainMenu.Draw(spriteBatch);
-                    break;
-
-                case GameState.NETWORK_MENU_CLIENT:
-                    networkMenuClient.Draw(spriteBatch);
-                    break;
-
-                case GameState.NETWORK_MENU_SERVER:
-                    networkMenuServer.Draw(spriteBatch);
-                    break;
-
-                case GameState.NETWORK_MENU_WAITING_FOR_SERVER:
-                    networkMenuClientWaiting.Draw(spriteBatch);
-                    break;
-
-                case GameState.FINISH_GAME:
-                    break;
-
-                case GameState.CONNECTION_REFUSED:
-                    networkMenuClient.Draw(spriteBatch);
-                    break;
-
-                case GameState.NETWORK_MENU_WAITING_FOR_CLIENTS:
-                    networkMenuServerWaiting.Draw(spriteBatch);
-                    break;
-
-                case GameState.PLAY_CLIENT:
-                case GameState.PLAY_SERVER:
-                    drawPlayingGame(spriteBatch);
-                    break;
-
-            }
-            
-            spriteBatch.End(); */
-
             base.Draw(gameTime);
         }  
     }

@@ -26,16 +26,21 @@ namespace Snake.FSM
         private GameField gameField;
         private Score score;
 
+        private StateBase currentState;
+        private StateBase mainMenuState;
+
         private KeyboardState currentKeyboardState;
 
         private int elapsedTime;
 
-        public State_ServerPlaying(SnakeFood snakeFood, List<Snake> snakes, GameField gameField, Score score)
+        public State_ServerPlaying(SnakeFood snakeFood, List<Snake> snakes, GameField gameField, Score score,StateBase mainMenuState)
         {
             this.snakeFood = snakeFood;
             this.snakes = snakes;
             this.gameField = gameField;
             this.score = score;
+            this.mainMenuState = mainMenuState;
+            currentState = this;
         }
 
         public void Update(ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime)
@@ -52,7 +57,7 @@ namespace Snake.FSM
 
         public StateBase getCurrentState()
         {
-            return this;
+            return currentState;
         }
 
         private void drawPlayingGame(SpriteBatch spriteBatch, GameGraphics gameGraphics)
@@ -170,44 +175,32 @@ namespace Snake.FSM
 
         private void updateSnakes(List<Snake> snakes, Boolean moveSnakes)
         {
-            //the only logic a client has, is that he sets the current direction of its snake according to the user input
-        /*    if (isClient)
+            int index = 0;
+            //server snake is always the first one
+            foreach (Snake snake in snakes)
             {
-                if (snakes.Count() > 0)
+                if (snake.IsGameOver)
                 {
-                    Snake clientSnake = snakes.ElementAt(client.SnakeNumber);
-                    setDirection(clientSnake);
-                    client.ClientSnakeDirection = clientSnake.ChoosenSnakeDirection;
+                    continue;
                 }
+
+                if (index == 0)
+                {
+                    setDirection(snake);
+                }
+
+                if (moveSnakes == true)
+                {
+                    //snakes are moved every second time, since updateSnakes is called twice with movesnakes during FRAMETIME
+                    if ((moveCondition % 2) == 0)
+                    {
+                        snake.Update(gameField);
+                        checkSnakesForKilling(snakes);
+                    }
+                }
+                index++;
             }
-            else
-            { */
-                int index = 0;
-                //server snake is always the first one
-                foreach (Snake snake in snakes)
-                {
-                    if (snake.IsGameOver)
-                    {
-                        continue;
-                    }
-
-                    if (index == 0)
-                    {
-                        //setDirection(snake);
-                    }
-
-                    if (moveSnakes == true)
-                    {
-                        //snakes are moved every second time, since updateSnakes is called twice with movesnakes during FRAMETIME
-                        if ((moveCondition % 2) == 0)
-                        {
-                            snake.Update(gameField);
-                            checkSnakesForKilling(snakes);
-                        }
-                    }
-                    index++;
-                }
-            
+   
 
             if (moveSnakes == true)
             {
@@ -216,7 +209,6 @@ namespace Snake.FSM
 
         }
         
-        /*
         private void setDirection(Snake snake){
              Snake.Direction tempDirection;
 
@@ -238,26 +230,11 @@ namespace Snake.FSM
             }
             else if (currentKeyboardState.IsKeyDown(Keys.Escape))
             {
-                
-                if (server != null)
-                {
-                    gameState = GameState.DISCONNECT_SERVER;
-                }
-                else if (client != null)
-                {
-                    gameState = GameState.DISCONNECT_CLIENT;
-                }
+                currentState = new State_Disconnect(mainMenuState);
+
                 return ; 
             }else
             {
-                return;
-            }
-
-
-            //direction is sent to server so it doesn't have to be checked for validity => server does that
-            if (isClient)
-            {
-                snake.ChoosenSnakeDirection = tempDirection;
                 return;
             }
 
@@ -266,8 +243,7 @@ namespace Snake.FSM
                 snake.ActualSnakeDirection = tempDirection;
             }
 
-        } */
-
+        } 
 
         
         private void checkIfGameFinished(List<Snake> snakes,Server server)
@@ -291,7 +267,7 @@ namespace Snake.FSM
             {
                  server.sendEndSignal(winner);
 
-              //   gameState = GameState.DISCONNECT_SERVER;   
+                 currentState = new State_Disconnect(mainMenuState);
             }
         } 
 

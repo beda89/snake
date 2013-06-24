@@ -20,7 +20,9 @@ namespace Snake.FSM
 
         private StateBase currentState;
 
-        public State_ServerInit()
+        private StateBase mainMenuState;
+
+        public State_ServerInit(StateBase mainMenuState)
         {
             gameField = new GameField();
             gameField.Initialize(TOPBOUND_Y);
@@ -31,6 +33,8 @@ namespace Snake.FSM
             score = new Score();
 
             currentState = this;
+
+            this.mainMenuState = mainMenuState;
         }
 
 
@@ -38,7 +42,7 @@ namespace Snake.FSM
         {
             initServerGame(server);
 
-            currentState = new State_ServerPlaying(snakeFood, snakes, gameField, score);
+            currentState = new State_ServerPlaying(snakeFood, snakes, gameField, score,mainMenuState);
         }
 
         public void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, GameGraphics gameGraphics)
