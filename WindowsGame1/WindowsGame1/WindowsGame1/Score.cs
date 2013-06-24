@@ -10,7 +10,7 @@ namespace Snake
     class Score
     {
         private const int Y_POSITION = 5;
-        private const int X_SPACE = 150;
+        private const int X_SPACE = 190;
 
         private SpriteFont customFont;
 
@@ -41,14 +41,28 @@ namespace Snake
             }
 
             if(player!=null){
-                spriteBatch.DrawString(customFont, "Player: " + player.Priority, new Vector2(20, Y_POSITION), player.SnakeColor);
+                if (player.IsGameOver)
+                {
+                    spriteBatch.DrawString(customFont, "Player: KILLED", new Vector2(20, Y_POSITION), player.SnakeColor);
+                }
+                else
+                {
+                    spriteBatch.DrawString(customFont, "Player: " + player.Priority, new Vector2(20, Y_POSITION), player.SnakeColor);
+                }
             }
 
             index=1;
 
             foreach (Snake enemy in enemies)
             {
-                spriteBatch.DrawString(customFont,"Enemy"+index+": "  +enemy.Priority , new Vector2(20+X_SPACE*index, Y_POSITION ), enemy.SnakeColor);
+                if (enemy.IsGameOver)
+                {
+                    spriteBatch.DrawString(customFont, "Enemy" + index + ": KILLED", new Vector2(20 + X_SPACE * index, Y_POSITION), enemy.SnakeColor);
+                }
+                else
+                {
+                    spriteBatch.DrawString(customFont, "Enemy" + index + ": " + enemy.Priority, new Vector2(20 + X_SPACE * index, Y_POSITION), enemy.SnakeColor);
+                }
                 index++;
             }
 

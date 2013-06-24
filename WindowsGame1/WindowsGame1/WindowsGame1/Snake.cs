@@ -14,7 +14,8 @@ namespace Snake
 
         public List<Vector2> Body{get;set;}
         public Vector2 Head { get; set; }
-        public Direction SnakeDirection;
+        public Direction ActualSnakeDirection { get; set; }
+        public Direction ChoosenSnakeDirection{get;set;}
         public Boolean IsGameOver { get; set; }
         public int Priority { get; set; }
 
@@ -28,31 +29,37 @@ namespace Snake
         private Vector2 oldLastPart;
 
         private Texture2D Texture;
-        private Boolean addPart = false;
+        private Texture2D[] heads;
+        private int addParts = 0;
 
         //only called by server
-        public void Initialize(Texture2D texture, Vector2 position,Direction SnakeDirection,int priority,Color snakeColor)
+        public void Initialize(Texture2D texture,Texture2D[] heads, Vector2 position,Direction SnakeDirection,int priority,Color snakeColor)
         {
             this.Position = position;
             this.Texture = texture;
 
-            this.SnakeDirection = SnakeDirection;
+            this.ActualSnakeDirection = SnakeDirection;
+            this.ChoosenSnakeDirection = SnakeDirection;
             this.IsGameOver = false;
             this.Priority = priority;
             this.SnakeColor = snakeColor;
+            this.heads = heads;
 
             buildSnake();
 
         }
 
         //only called by client
-        public void Initialize(Texture2D texture, Vector2 head, List<Vector2> body,int priority,Color snakeColor)
+        public void Initialize(Texture2D texture,Texture2D[] heads, Vector2 head, List<Vector2> body,Direction SnakeDirection, int priority,Color snakeColor)
         {
             this.Head = head;
             this.Body = body;
             this.Texture = texture;
             this.Priority = priority;
             this.SnakeColor = snakeColor;
+            this.heads = heads;
+            this.ChoosenSnakeDirection = SnakeDirection;
+            this.ActualSnakeDirection = SnakeDirection;
         }
 
         //snake is initialized with 5 segments
@@ -65,7 +72,7 @@ namespace Snake
 
             for (int i = 0; i < 4; i++)
             {
-                switch (SnakeDirection)
+                switch (ActualSnakeDirection)
                 {
                     case Direction.Up:
                         tempPosition.Y -= 16;
@@ -90,7 +97,7 @@ namespace Snake
         {
                 Vector2 tempPosition = Position;
 
-                switch (SnakeDirection)
+                switch (ActualSnakeDirection)
                 {
                     case Direction.Up:
                         tempPosition.Y -= 16;
@@ -111,7 +118,7 @@ namespace Snake
                     return;
                 }
 
-                LastMovedDirection = SnakeDirection;
+                LastMovedDirection = ActualSnakeDirection;
 
                 Position = tempPosition;
 
@@ -136,22 +143,36 @@ namespace Snake
 
                 Head = Position;
 
-                if (addPart == true)
+                if (addParts >0)
                 {
                     Body.Add(oldLastPart);
-                    addPart = false;
+                    addParts--;
                 }
         }
 
-        public void AddPart()
+        public void AddPart(int numberOfParts)
         {
-            addPart = true;
+            addParts+=numberOfParts;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             //Drawing head
-            spriteBatch.Draw(Texture, Head, Color.White);
+
+            if (ActualSnakeDirection == Snake.Direction.Up)
+            {
+                spriteBatch.Draw(heads[0], Head, Color.White);
+            }else if(ActualSnakeDirection == Snake.Direction.Down){
+                 spriteBatch.Draw(heads[1], Head, Color.White);
+            }
+            else if (ActualSnakeDirection == Snake.Direction.Left)
+            {
+                spriteBatch.Draw(heads[2], Head, Color.White);
+            }
+            else if (ActualSnakeDirection == Snake.Direction.Right)
+            {
+                spriteBatch.Draw(heads[3], Head, Color.White);
+            }
 
             //Drawing Body
             foreach (Vector2 part in Body)
@@ -176,6 +197,10 @@ namespace Snake
 
         public void CheckIfEatenByEnemy(List<Snake> snakes)
         {
+            if (IsGameOver)
+                return;
+
+
             foreach (Snake enemy in snakes)
             {
                 if (enemy.Equals(this))
@@ -195,7 +220,7 @@ namespace Snake
                     if (part.Equals(enemy.Head))
                     {
                         //TODO could be changed
-                        enemy.AddPart();
+                        enemy.AddPart(Body.Count() - bodyIndex);
 
                         //remove the eaten part and all following
                         Body.RemoveRange(bodyIndex, Body.Count() - bodyIndex);

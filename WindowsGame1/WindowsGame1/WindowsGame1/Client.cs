@@ -33,16 +33,17 @@ namespace Snake
         private NetworkStream stream;
 
         private Texture2D[] snakeTexture;
+        private Texture2D[][] heads;
         
-        public Client(String ipString, int port,Texture2D[] texture)
+        public Client(String ipString, int port,Texture2D[] texture,Texture2D[][] heads)
         {
-            
             this.InGameState = InGameState.STARTING;
             //TODO: refactor (client gamestate shouldn't be necessary)
             this.ClientGameState=GameState.NETWORK_MENU_WAITING_FOR_SERVER;
             this.ip = ipString;
             this.port = port;
             this.snakeTexture = texture;
+            this.heads = heads;
 
            //TODO:dummy value
            ClientSnakeDirection = Snake.Direction.Left;
@@ -53,7 +54,6 @@ namespace Snake
            snakeColors.Add(Color.FromNonPremultiplied(176, 61, 201, 255));
            snakeColors.Add(Color.FromNonPremultiplied(253, 162, 4, 255));
            snakeColors.Add(Color.FromNonPremultiplied(240, 255, 5, 255));
-
         }
 
         public void Start(){
@@ -75,6 +75,8 @@ namespace Snake
                         communicationProtocol(message, writer);
                     }
                 }
+
+                ClientGameState = GameState.DISCONNECT_CLIENT;
 
             }
             catch (SocketException)
@@ -142,7 +144,7 @@ namespace Snake
             }
         }
 
-        //initalizes every snakes at the beginning of the game, according to the start message of the server
+        //initalizes every snakes at the beginning of the game, according to the start  message of the server
         private void initSnakesAndSetPositions(String[] snakePositionStrings)
         {
             int snakeIndex = 0;
@@ -150,11 +152,12 @@ namespace Snake
             for (int i = 0; i < snakePositionStrings.Length; i++)
             {
                 List<Vector2> parts = parsePositionString(snakePositionStrings[i]);
+                int priority = parseSnakePriority(snakePositionStrings[i]);
+                Snake.Direction snakeDirection = parseSnakeDirection(snakePositionStrings[i]);
 
                 Snake snake = new Snake();
-
-                //TODO: change priority                     
-                snake.Initialize(snakeTexture[snakeIndex], parts.ElementAt(0), parts.GetRange(1, parts.Count - 1), i, snakeColors.ElementAt(i));
+                 
+                snake.Initialize(snakeTexture[snakeIndex],heads[snakeIndex], parts.ElementAt(0), parts.GetRange(1, parts.Count - 1),snakeDirection,priority, snakeColors.ElementAt(i));
                 Snakes.Add(snake);
                 snakeIndex++;
             }
@@ -168,6 +171,10 @@ namespace Snake
             for (int i = 0; i < snakePositionStrings.Length; i++)
             {
                 List<Vector2> parts = parsePositionString(snakePositionStrings[i]);
+                int priority = parseSnakePriority(snakePositionStrings[i]);
+                Snake.Direction snakeDirection = parseSnakeDirection(snakePositionStrings[i]);
+
+                Snakes.ElementAt(snakeIndex).Priority = priority;
 
                 //if snake is gameOver server sends position [0 0]
                 if (parts.ElementAt(0).Equals(new Vector2(0, 0)))
@@ -178,13 +185,14 @@ namespace Snake
                 {
                     Snakes.ElementAt(snakeIndex).Head = parts.First();
                     Snakes.ElementAt(snakeIndex).Body = parts.GetRange(1,parts.Count()-1);
+                    Snakes.ElementAt(snakeIndex).ActualSnakeDirection = snakeDirection;
                 }
                 
                 snakeIndex++;
             }
         }
 
-        //splits the received message in the positionStrings according to every snake
+        //splits the received message in the positionStrings according to the snakes
         private String[] seperateSnakes(String message)
         {
             String[] snakePositionStrings;
@@ -232,13 +240,13 @@ namespace Snake
             List<Vector2> parts = new List<Vector2>();
 
 
-            //there always has to be a position.X and position.Y pair
+            //there always has to be a position.X and position.Y pair + Priority + Direction so it has to be even
             if (splittedPositions.Length % 2 == 1)
             {
                 throw new MessageException();
             }
 
-            for (int index = 0; index < splittedPositions.Length; index++)
+            for (int index = 0; index < splittedPositions.Length-2; index++)
             {
                 try
                 {
@@ -255,6 +263,39 @@ namespace Snake
             }
 
             return parts;   
+        }
+
+        private int parseSnakePriority(String positionString)
+        {
+
+            String[] numbers = positionString.Split(' ');
+            int priority = Convert.ToInt32(numbers[numbers.Length - 2]);
+
+            return priority;
+
+        }
+
+        private Snake.Direction parseSnakeDirection(String positionString)
+        {
+            String[] temp = positionString.Split(' ');
+            String direction = temp[temp.Length - 1];
+
+            if (direction.Equals("Down"))
+            {
+                return Snake.Direction.Down;
+            }
+
+            if (direction.Equals("Up"))
+            {
+                return Snake.Direction.Up;
+            }
+
+            if (direction.Equals("Left"))
+            {
+                return Snake.Direction.Left;
+            }
+
+            return Snake.Direction.Right;
         }
     }
 }

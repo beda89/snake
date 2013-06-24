@@ -40,15 +40,7 @@ namespace Snake.Menus
 
         public Boolean hasValidInput()
         {
-            try
-            {
-                Convert.ToInt32(PortInput.InputText);
-                return true;
-            }
-            catch (FormatException)
-            {
-                return false;
-            }
+             return  PortInput.CheckPortInput();
         }
     
     }

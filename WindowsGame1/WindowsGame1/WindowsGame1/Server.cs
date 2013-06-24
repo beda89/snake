@@ -73,6 +73,7 @@ namespace Snake
         }
 
         //sends startSignal to every client with snake Positions and the number of the snake assigned to the client
+        //!start clientSnakeNumber [Snake1.X1 Snake1.Y1 Snake1.X2 Snake1.Y2 ... Snake1.Priority] [Snake2.X1 Snake2.Y1 Snake2.X2 Snake.Y2 ... Snake2.Priority] SnakeFood.X SnakeFoodY !
         public void sendStartSignal(List<Snake> snakes,SnakeFood snakeFoodPosition)
         {
             //player number which gets assigned to every client, starts with 1 because server is 0
@@ -83,9 +84,20 @@ namespace Snake
                 StreamWriter writer=new StreamWriter(tcpClient.GetStream());
                 writer.WriteLine("!start " + index + buildSnakePositionsString(snakes) + buildFoodPositionString(snakeFoodPosition.Position)+" !");
                 writer.Flush();
+                index++;
             }
 
             InGameState = InGameState.RUNNING;
+        }
+
+        public void sendEndSignal(int winner)
+        {
+            foreach (TcpClient tcpClient in CurrentClients)
+            {
+                StreamWriter writer = new StreamWriter(tcpClient.GetStream());
+                writer.WriteLine("!end");
+                writer.Flush();
+            }
         }
 
         //sends string with current positions of every segment of every snake
@@ -112,7 +124,7 @@ namespace Snake
                 //client sends direction and server checks if valid
                 if (GameUtils.IsDirectionValid(snake, snakeDirection))
                 {
-                    snakes.ElementAt(index).SnakeDirection = snakeDirection;
+                    snakes.ElementAt(index).ActualSnakeDirection = snakeDirection;
                 }
 
                 index++;
@@ -171,7 +183,6 @@ namespace Snake
 
             return positions.ToString();
         }
-
         private String buildFoodPositionString(Vector2 snakeFoodPosition)
         {
             StringBuilder position = new StringBuilder(" ");
@@ -180,14 +191,15 @@ namespace Snake
             return position.ToString();
         }
 
-        //builds position String for given snake: [posX1 posY1 posX2 posY2 .... ]
+        //builds position String for given snake: [posX1 posY1 posX2 posY2 .... priority direction] 
+        //appends priority
         private String buildPositionString(Snake snake)
         {
             StringBuilder positions = new StringBuilder("[");
 
             if (snake.IsGameOver)
             {
-                positions.Append("0 0");
+                positions.Append("0 0 ");
             }
             else
             {
@@ -198,8 +210,11 @@ namespace Snake
                     positions.Append(part.X + " " + part.Y + " ");
                 }
 
-                positions = positions.Remove(positions.Length - 1, 1);
             }
+
+            positions.Append(snake.Priority);
+            positions.Append(" "+snake.ActualSnakeDirection);
+
             positions.Append("]");
 
             return positions.ToString();
