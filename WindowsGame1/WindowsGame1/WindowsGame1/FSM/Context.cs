@@ -18,9 +18,9 @@ namespace Snake.FSM
 
         }
 
-        public void Update(Server server,Thread serverThread, Client client,Thread clientThread, GameTime gameTime)
+        public void Update(ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread, GameTime gameTime)
         {
-            state.Update(server,serverThread,client,clientThread);
+            state.Update(ref server,ref serverThread,ref client,ref clientThread,gameTime);
 
             state = state.getCurrentState();
         }

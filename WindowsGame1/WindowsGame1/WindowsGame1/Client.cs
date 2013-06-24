@@ -8,21 +8,29 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Snake.Exceptions;
 using Microsoft.Xna.Framework.Graphics;
+using Snake.FSM;
 
 namespace Snake
 {
+
+    public enum ClientState
+    {
+        WAITING,
+        PLAYING,
+        DISCONNECT
+    };
+
     class Client
     {
+
         public Snake.Direction ClientSnakeDirection { get; set; }
         private List<Color> snakeColors=new List<Color>();
 
+        public ClientState ClientGameState { get; private set; }
+
         //every snake in play(are initialized and managed by server)
         public List<Snake> Snakes { get; set; }
-        public GameState ClientGameState { get; private set; }
-
-        //states while playing
-        public InGameState InGameState{get;set;} 
-
+  
         //snakeNumber assigned by server, server is always 0
         public int SnakeNumber { get; private set; }
         public Vector2 SnakeFoodPosition {get; set;}
@@ -38,8 +46,6 @@ namespace Snake
             this.ip = ipString;
             this.port = port;
 
-
-           //TODO:dummy value
            ClientSnakeDirection = Snake.Direction.Left;
 
            Snakes = new List<Snake>();
@@ -51,6 +57,8 @@ namespace Snake
         }
 
         public void Start(){
+            ClientGameState = ClientState.WAITING;
+
             try
             {
                 tcpClient = new TcpClient(ip, port);
@@ -70,16 +78,14 @@ namespace Snake
                     }
                 }
 
-                ClientGameState = GameState.DISCONNECT_CLIENT;
-
             }
             catch (SocketException)
             {
-                ClientGameState = GameState.DISCONNECT_CLIENT;
+                ClientGameState = ClientState.DISCONNECT;
             }
             catch (IOException)
             {
-                ClientGameState = GameState.DISCONNECT_CLIENT;
+                ClientGameState = ClientState.DISCONNECT;
             }
         } 
 
@@ -108,9 +114,6 @@ namespace Snake
             {
                 String[] splittedMessage = message.Split(new Char[]{' '}, 3);
 
-                ClientGameState = GameState.PLAY_CLIENT;
-                InGameState = InGameState.STARTING;
-
                 SnakeNumber = Convert.ToInt32(splittedMessage[1]);
 
                 String[] snakePositions = seperateSnakes(splittedMessage[2]);
@@ -118,6 +121,9 @@ namespace Snake
                 //sets the global snakes list
                 initSnakesAndSetPositions(snakePositions);
                 SnakeFoodPosition = parseSnakeFoodPosition(splittedMessage[2]);
+
+                ClientGameState = ClientState.PLAYING;
+
             }
             else if (message.StartsWith("!game"))
             {
@@ -133,7 +139,7 @@ namespace Snake
             }
             else if (message.StartsWith("!end"))
             {
-                 //TODO
+                ClientGameState = ClientState.DISCONNECT;
 
             }
         }

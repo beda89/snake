@@ -5,22 +5,23 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Snake.FSM;
 
 namespace Snake.Menus
 {
-    class NetworkMenuClientWaiting //:Menu
+    class NetworkMenuClientWaiting:Menu
     {
-        /*
-        public NetworkMenuClientWaiting(Texture2D snakePic, SpriteFont customFont, Vector2 startPosition)
-            : base(snakePic, customFont,startPosition, GameState.NETWORK_MENU_WAITING_FOR_SERVER)
+        
+        public NetworkMenuClientWaiting(Vector2 startPosition,StateBase standardState,StateBase mainMenuState,StateBase networkClientMenuState)
+            : base(startPosition, standardState)
         {
-            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), GameState.DISCONNECT_CLIENT));
+            items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), new State_Disconnect(mainMenuState)));
         }
 
-        public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics)
         {
-            base.Draw(spriteBatch);
-            spriteBatch.DrawString(base.font, "Waiting for Server ...", new Vector2(startPosition.X+200, startPosition.Y), Color.Black);
-        } */
+            base.Draw(spriteBatch,gameGraphics);
+            spriteBatch.DrawString(gameGraphics.CustomFont, "Waiting for Server ...", new Vector2(startPosition.X+200, startPosition.Y), Color.Black);
+        } 
     }
 }

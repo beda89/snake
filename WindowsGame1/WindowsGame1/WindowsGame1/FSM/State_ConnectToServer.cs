@@ -26,7 +26,7 @@ namespace Snake.FSM
         }
 
 
-        public void Update(Server server,Thread serverThread, Client client,Thread clientThread)
+        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             if (!networkMenuClient.InputFieldsAreValid())
             {
@@ -34,7 +34,8 @@ namespace Snake.FSM
             }
             else
             {
-                tryConnectionToServer(client,clientThread);
+                tryConnectionToServer(ref client,ref clientThread);
+                currentState = new State_NetworkMenuClientWaiting(menuPosition,oldState,mainMenuState);
             }
         }
 
@@ -48,7 +49,7 @@ namespace Snake.FSM
             return currentState;
         }
 
-        private void tryConnectionToServer(Client client,Thread clientThread)
+        private void tryConnectionToServer(ref Client client,ref Thread clientThread)
         {
             int port = Convert.ToInt32(networkMenuClient.PortInput.InputText);
             String ip = networkMenuClient.IpInput.InputText;

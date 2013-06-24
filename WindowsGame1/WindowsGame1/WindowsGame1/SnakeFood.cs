@@ -10,18 +10,15 @@ namespace Snake
     class SnakeFood
     {
         public Vector2 Position { get; set; }
-        private Texture2D snakeFoodTexture;
         private int gameFieldWidth;
         private int gameFieldHeight;
         private int topGameFieldBound;
 
-        public void Initialize(int topGameFieldBound,Texture2D snakeFoodTexture,GraphicsDeviceManager graphics)
+        public void Initialize(int topGameFieldBound)
         {
-            this.snakeFoodTexture = snakeFoodTexture;
-            this.gameFieldWidth = graphics.GraphicsDevice.Viewport.Width;
-            this.gameFieldHeight = graphics.GraphicsDevice.Viewport.Height;
+            this.gameFieldWidth = 512;
+            this.gameFieldHeight = 512;
             this.topGameFieldBound = topGameFieldBound;
-
 
             Position = generateNewPosition();
         }
@@ -38,10 +35,9 @@ namespace Snake
             return false;
         }
 
-
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics)
         {
-            spriteBatch.Draw(snakeFoodTexture, Position, Color.White);
+            spriteBatch.Draw(gameGraphics.RedAppleTexture, Position, Color.White);
         }
 
         //generates a random position inside the game field

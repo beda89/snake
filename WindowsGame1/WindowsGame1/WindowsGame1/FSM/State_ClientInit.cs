@@ -5,33 +5,29 @@ using System.Text;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Snake.Menus;
 
 namespace Snake.FSM
 {
-    class State_NetworkMenuServerWaiting:StateBase
+    class State_ClientInit:StateBase
     {
-        private NetworkMenuServerWaiting networkMenuServerWaiting;
-
-        public State_NetworkMenuServerWaiting(Vector2 menuPosition,StateBase mainMenuState)
+        public State_ClientInit()
         {
-            networkMenuServerWaiting = new NetworkMenuServerWaiting(menuPosition,this, mainMenuState);
-        }
 
+        }
 
         public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
-            networkMenuServerWaiting.Update();
+            
         }
 
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
-            networkMenuServerWaiting.Draw(spriteBatch, gameGraphics);
+           //nothing to do here
         }
 
         public StateBase getCurrentState()
         {
-            return networkMenuServerWaiting.CurrentState;
+            throw new NotImplementedException();
         }
     }
 }

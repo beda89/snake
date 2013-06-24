@@ -19,7 +19,7 @@ namespace Snake.FSM
             mainMenu = new MainMenu(menuPosition,this);
         }
 
-        public void Update(Server server, Thread serverThread, Client client, Thread clientThread)
+        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             mainMenu.Update();
         }

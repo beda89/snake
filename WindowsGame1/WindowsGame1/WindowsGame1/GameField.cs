@@ -8,21 +8,19 @@ namespace Snake
 {
     class GameField
     {
+        private const int TEXTURE_SIZE = 16;
+
         // The image representing a border segment
-        private Texture2D texture;
-        private GraphicsDeviceManager graphics;
         private List<Vector2> boundPositions;
         private int gameFieldWidth;
         private int gameFieldHeight;
         private int topBorderY;
 
-        public void Initialize(int topBorderY,Texture2D texture,GraphicsDeviceManager graphics)
+        public void Initialize(int topBorderY)
         {
-            this.texture = texture;
-            this.graphics = graphics;
 
-            this.gameFieldWidth = graphics.GraphicsDevice.Viewport.Width;
-            this.gameFieldHeight = graphics.GraphicsDevice.Viewport.Height;
+            this.gameFieldWidth = 800;
+            this.gameFieldHeight = 480;
             this.topBorderY = topBorderY;
 
             boundPositions=new List<Vector2>();
@@ -30,30 +28,30 @@ namespace Snake
             for (int i = 0; i < gameFieldWidth; i = i + 16)
             {
                 boundPositions.Add(new Vector2(i,topBorderY));
-                boundPositions.Add(new Vector2(i, gameFieldHeight- texture.Height));
+                boundPositions.Add(new Vector2(i, gameFieldHeight- 16));
             }
 
             for (int i = topBorderY; i < gameFieldHeight; i = i + 16)
             {
                 boundPositions.Add(new Vector2(0,i));
-                boundPositions.Add(new Vector2(gameFieldWidth - texture.Width, i));
+                boundPositions.Add(new Vector2(gameFieldWidth - 16, i));
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch,GameGraphics gameGraphics)
         {
             foreach(Vector2 vector in boundPositions){
-                spriteBatch.Draw(texture, vector, Color.White);
+                spriteBatch.Draw(gameGraphics.BoundsTexture, vector, Color.White);
             }
         }
 
         public Boolean Collides(Vector2 position){
-            if (position.X < texture.Width || position.X >= (gameFieldWidth-texture.Width))
+            if (position.X < TEXTURE_SIZE || position.X >= (gameFieldWidth - TEXTURE_SIZE))
             {
                 return true;
             }
 
-            if (position.Y < (topBorderY+texture.Height) || position.Y >= (gameFieldHeight - texture.Height))
+            if (position.Y < (topBorderY + TEXTURE_SIZE) || position.Y >= (gameFieldHeight - TEXTURE_SIZE))
             {
                 return true;
             }

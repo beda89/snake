@@ -15,7 +15,7 @@ namespace Snake
     {
         private const int MAX_CLIENTS = 3;
 
-        public InGameState InGameState { get; set; }
+     //   public InGameState InGameState { get; set; }
 
         //TODO: check for threadsafety
         public List<TcpClient> CurrentClients{get;private set;}
@@ -28,7 +28,7 @@ namespace Snake
             this.port = port;
             this.tcpListener = new TcpListener(IPAddress.Any, port);
             this.CurrentClients = new List<TcpClient>();
-            this.InGameState=InGameState.STARTING;
+        //    this.InGameState=InGameState.STARTING;
         }
 
         public void Start(){
@@ -87,7 +87,7 @@ namespace Snake
                 index++;
             }
 
-            InGameState = InGameState.RUNNING;
+         //   InGameState = InGameState.RUNNING;
         }
 
         public void sendEndSignal(int winner)

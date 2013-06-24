@@ -17,7 +17,7 @@ using Snake.Menus;
 
 namespace Snake
 {
-
+    /*
     public enum GameState { MAIN_MENU, 
                             NETWORK_MENU_SERVER, 
                             NETWORK_MENU_CLIENT, 
@@ -37,7 +37,7 @@ namespace Snake
     {
         STARTING,
         RUNNING,
-    };
+    }; */
 
 
     /// <summary>
@@ -47,48 +47,19 @@ namespace Snake
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         #region fields
-        //TopBound of the gameField (space above is used for current score)
-        private const int TOPBOUND_Y = 32;
-        // The time we display a frame until the next one
-        private const int FRAME_TIME = 250;
-
-        // priority of snakes is changed every 50 moves
-        private const int PRIORITY_CHANGE_CONDITION = 50;
 
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private GameField gameField;
-        private SnakeFood snakeFood;
-        private KeyboardState currentKeyboardState;
+
         private Vector2 menuPosition;
         private Thread serverThread;
         private Thread clientThread;
-
- //       private GameState gameState;
- //       private InGameState inGameState;
-
-      //  private Menu mainMenu;
-      //  private NetworkMenuServer networkMenuServer;
-      //  private NetworkMenuServerWaiting networkMenuServerWaiting;
-      //  private NetworkMenuClient networkMenuClient;
-      //  private Menu networkMenuClientWaiting;
 
         private Server server;
         private Client client;
 
         private Context context;
-
-        private Boolean isClient = false;
-        private int elapsedTime = 0;
-        private int moveCondition = 0;
-        private int moveCounter = 0;
-
         private GameGraphics gameGraphics;
-
-        //server manages the snakes
-        private List<Snake> snakes;
-
-        private Score score;
 
         #endregion
 
@@ -138,27 +109,8 @@ namespace Snake
             menuPosition = new Vector2(50, graphics.GraphicsDevice.Viewport.Height - 150);
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            /*mainMenu = new MainMenu(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
-            networkMenuServer = new NetworkMenuServer(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
-            networkMenuClient = new NetworkMenuClient(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
-            networkMenuClientWaiting = new NetworkMenuClientWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition);
-            networkMenuServerWaiting = new NetworkMenuServerWaiting(gameGraphics.SnakePic, gameGraphics.CustomFont, menuPosition); */
-
-            gameField = new GameField();
-            gameField.Initialize(TOPBOUND_Y, gameGraphics.BoundsTexture, graphics);
-
-            snakeFood = new SnakeFood();
-            snakeFood.Initialize(TOPBOUND_Y, gameGraphics.RedAppleTexture, graphics);
-
-            score = new Score(gameGraphics.CustomFont);
-
+            //State pattern
             context = new Context(new State_MainMenu(menuPosition));
-
-            //initial GameState
-      //      gameState = GameState.MAIN_MENU;
-
-
-
         }
 
         /// <summary>
@@ -228,7 +180,7 @@ namespace Snake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            context.Update(server,serverThread, client, clientThread,gameTime);
+            context.Update(ref server,ref serverThread,ref client,ref clientThread,gameTime);
 
 
             /*
@@ -356,88 +308,12 @@ namespace Snake
                 this.Exit();
             */
             // Read the current state of the keyboard and gamepad and store it
-            currentKeyboardState = Keyboard.GetState();
+           
            // currentGamePadState = GamePad.GetState(PlayerIndex.One);
 
             base.Update(gameTime);
         }
-        /*
-        //only called by the server
-        private void inPlay(GameTime gameTime)
-        {
-            // Update the elapsed time
-            elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            //we communicate with clients 2x during one frame
-            if (elapsedTime > FRAME_TIME / 2)
-            {
-                try
-                {
-                    server.CommunicateWithClients(snakes, snakeFood);
-                }
-                catch (MessageException)
-                {
-                    gameState=GameState.DISCONNECT_SERVER;
-
-                    return;
-                }
-
-                //snakes are moved once during frameTime
-                updateSnakes(snakes, true);
-                gameLogic(snakes);
-
-                elapsedTime = 0;
-            }
-            else
-            {
-                updateSnakes(snakes, false);
-
-            }
-        }
-
-        private void initServerGame()
-        {
-            //init snakes, first one is needed for server
-            snakes = new List<Snake>();
-            Snake snake = new Snake();
-
-            //ColorTranslator;
-
-            //TODO: change priority
-            snake.Initialize(gameGraphics.SnakeTexture[0],gameGraphics.SnakeHeads[0], new Vector2(128f, 64f), Snake.Direction.Right, 1, Color.FromNonPremultiplied(81, 220, 50, 255));
-            snakes.Add(snake);
-
-            //TODO has to be changed for more than 2 players (player 3 and 4 would start at same position as player 2
-            int clientsCount=server.CurrentClients.Count();
-
-
-            if (clientsCount >= 1)
-            {
-                snake = new Snake();
-                //TODO change priority
-                snake.Initialize(gameGraphics.SnakeTexture[1],gameGraphics.SnakeHeads[1], new Vector2(256f, 256f), Snake.Direction.Right, 2, Color.FromNonPremultiplied(176, 61, 201, 255));
-                snakes.Add(snake);
-            }
-
-            if (clientsCount >= 2)
-            {
-                snake = new Snake();
-                snake.Initialize(gameGraphics.SnakeTexture[2],gameGraphics.SnakeHeads[2], new Vector2(512f, 128f), Snake.Direction.Right, 3, Color.FromNonPremultiplied(253, 162, 4, 255));
-                snakes.Add(snake);
-            }
-
-            if (clientsCount == 3)
-            {
-                snake = new Snake();
-                snake.Initialize(gameGraphics.SnakeTexture[3],gameGraphics.SnakeHeads[3], new Vector2(512f, 256f), Snake.Direction.Up, 4, Color.FromNonPremultiplied(240, 255, 5, 255));
-                snakes.Add(snake);
-            }
-
-            inGameState = InGameState.RUNNING;
-
-            //sending startsignals to all clients
-            server.sendStartSignal(snakes, snakeFood);
-        }
         /*
         private void startServer()
         {
@@ -454,155 +330,6 @@ namespace Snake
         } */
 
 
-        /*
-         * contains the whole gamelogic
-         * it is all done by the server
-         * 
-         */
-        private void gameLogic(List<Snake> snakes)
-        {
-            moveCounter++;
-
-            if (moveCounter == PRIORITY_CHANGE_CONDITION)
-            {
-                moveCounter = 0;
-                changePriorities(snakes);
-            }
-
-
-            foreach(Snake snake in snakes){
-                if(snakeFood.IsEaten(snake)){
-                    snake.AddPart(1);
-                }
-
-                //snake dies if it eats itself
-                if (snake.CollidesWithItself())
-                {
-                    snake.IsGameOver = true;
-                }
-
-                snake.CheckIfEatenByEnemy(snakes);
-            }
-
-            //checkIfGameFinished(snakes);
-
-            
-
-
-        }
-
-        private void changePriorities(List<Snake> snakes)
-        {
-            int tempPriority1 = snakes.Last().Priority;
-            int tempPriority2 = 0;
-
-            foreach (Snake snake in snakes)
-            {
-                tempPriority2 = snake.Priority;
-                snake.Priority = tempPriority1;
-                tempPriority1 = tempPriority2;
-            }
-        }
-
-        //TODO refactor
-        /*
-        private void updateSnakes(List<Snake> snakes,Boolean moveSnakes)
-         {
-            //the only logic a client has, is that he sets the current direction of its snake according to the user input
-            if (isClient)
-            {
-                if (snakes.Count() > 0)
-                {
-                    Snake clientSnake = snakes.ElementAt(client.SnakeNumber);
-                    setDirection(clientSnake);
-                    client.ClientSnakeDirection = clientSnake.ChoosenSnakeDirection;
-                }
-            }
-            else
-            {
-                int index = 0;
-                //server snake is always the first one
-                foreach (Snake snake in snakes)
-                {
-                    if (snake.IsGameOver)
-                    {
-                        continue;
-                    }
-
-                    if (index == 0)
-                    {
-                        setDirection(snake);
-                    }
-
-                    if (moveSnakes == true)
-                    {
-                        //snakes are moved every second time, since updateSnakes is called twice with movesnakes during FRAMETIME
-                        if ((moveCondition % 2 )==0)
-                        {
-                            snake.Update(gameField);
-                            checkSnakesForKilling(snakes);
-                        }
-                    }
-                    index++;
-                }
-            }
-
-            if (moveSnakes == true)
-            {
-                moveCondition++;
-            }
-
-        }
-        /*
-        private void setDirection(Snake snake){
-             Snake.Direction tempDirection;
-
-            if (currentKeyboardState.IsKeyDown(Keys.Left))
-            {
-                tempDirection = Snake.Direction.Left;
-            }
-            else if (currentKeyboardState.IsKeyDown(Keys.Right))
-            {
-                tempDirection = Snake.Direction.Right;
-            }
-            else if (currentKeyboardState.IsKeyDown(Keys.Up))
-            {
-                tempDirection = Snake.Direction.Up;
-            }
-            else if (currentKeyboardState.IsKeyDown(Keys.Down))
-            {
-                tempDirection = Snake.Direction.Down;
-            }
-            else if (currentKeyboardState.IsKeyDown(Keys.Escape))
-            {
-                if (server != null)
-                {
-                    gameState = GameState.DISCONNECT_SERVER;
-                }
-                else if (client != null)
-                {
-                    gameState = GameState.DISCONNECT_CLIENT;
-                }
-                return ;
-            }else
-            {
-                return;
-            }
-
-
-            //direction is sent to server so it doesn't have to be checked for validity => server does that
-            if (isClient)
-            {
-                snake.ChoosenSnakeDirection = tempDirection;
-                return;
-            }
-
-            if (GameUtils.IsDirectionValid(snake,tempDirection))
-            {
-                snake.ActualSnakeDirection = tempDirection;
-            }
-
-        } */
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -660,117 +387,6 @@ namespace Snake
             spriteBatch.End(); */
 
             base.Draw(gameTime);
-        }
-
-        private void drawPlayingGame(SpriteBatch spriteBatch)
-        {
-            //during gameplay mouse should disappear
-            this.IsMouseVisible = false;
-
-            if (snakeFood != null)
-            {
-                snakeFood.Draw(spriteBatch);
-            }
-
-            if (snakes != null)
-            {
-                int index = 0;
-                foreach (Snake snake in snakes)
-                {
-                    if (snake.IsGameOver)
-                    {
-                        continue;
-                    }
-
-                    snake.Draw(spriteBatch,gameGraphics,index);
-                    index++;
-                }
-                gameField.Draw(spriteBatch);
-
-                if (isClient)
-                {
-                    score.Draw(spriteBatch, snakes, client.SnakeNumber);
-                }
-                else
-                {
-                    //server is always snakeNumber 0
-                    score.Draw(spriteBatch, snakes, 0);
-                }
-
-            }
-        }
-
-        private void checkSnakesForKilling(List<Snake> snakes)
-        {
-
-            //TODO refactor
-            foreach (Snake snake in snakes)
-            {
-                if (snake.IsGameOver)
-                {
-                    continue;
-                }
-
-
-                foreach (Snake enemy in snakes)
-                {
-                    if (enemy.Equals(snake))
-                    {
-                        continue;
-                    }
-
-                    if (enemy.IsGameOver)
-                    {
-                        continue;
-                    }
-
-
-                    if (enemy.Head.Equals(snake.Head))
-                    {
-                        if (enemy.Priority > snake.Priority)
-                        {
-                            enemy.AddPart(snake.Body.Count()+1);
-                            snake.IsGameOver = true;
-                        }
-                        else if (enemy.Priority < snake.Priority)
-                        {
-                            snake.AddPart(enemy.Body.Count()+1);
-                            enemy.IsGameOver = true;
-                        }
-
-                    }
-
-                }
-
-            }
-
-
-        }
-        /*
-        private void checkIfGameFinished(List<Snake> snakes)
-        {
-            int index = 0;
-            int winner = 0;
-
-            foreach (Snake snake in snakes)
-            {
-                if (snake.IsGameOver == false)
-                {
-                    index++;
-                }
-                else
-                {
-                    winner++;
-                }
-            }
-
-            if (index <= 1)
-            {
-                 server.sendEndSignal(winner);
-
-                 gameState = GameState.DISCONNECT_SERVER;   
-            }
-        } */
-    
+        }  
     }
 }
