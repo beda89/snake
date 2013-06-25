@@ -14,10 +14,6 @@ namespace Snake
     class Server
     {
         private const int MAX_CLIENTS = 3;
-
-     //   public InGameState InGameState { get; set; }
-
-        //TODO: check for threadsafety
         public List<TcpClient> CurrentClients{get;private set;}
 
         private int port;
@@ -28,7 +24,6 @@ namespace Snake
             this.port = port;
             this.tcpListener = new TcpListener(IPAddress.Any, port);
             this.CurrentClients = new List<TcpClient>();
-        //    this.InGameState=InGameState.STARTING;
         }
 
         public void Start(){
@@ -87,7 +82,6 @@ namespace Snake
                 index++;
             }
 
-         //   InGameState = InGameState.RUNNING;
         }
 
         public void sendEndSignal(int winner)
@@ -114,21 +108,21 @@ namespace Snake
             //snake with index=0 belongs to server
             int index = 1;
 
-            foreach (TcpClient tcpClient in CurrentClients)
-            {
-                sendCurrentPosition(tcpClient,snakes,snakeFood);
-
-                Snake.Direction snakeDirection = receiveCurrentDirection(tcpClient);
-                Snake snake=snakes.ElementAt(index);
-
-                //client sends direction and server checks if valid
-                if (GameUtils.IsDirectionValid(snake, snakeDirection))
+                foreach (TcpClient tcpClient in CurrentClients)
                 {
-                    snakes.ElementAt(index).ActualSnakeDirection = snakeDirection;
-                }
+                    sendCurrentPosition(tcpClient, snakes, snakeFood);
 
-                index++;
-            }
+                    Snake.Direction snakeDirection = receiveCurrentDirection(tcpClient);
+                    Snake snake = snakes.ElementAt(index);
+
+                    //client sends direction and server checks if valid
+                    if (GameUtils.IsDirectionValid(snake, snakeDirection))
+                    {
+                        snakes.ElementAt(index).ActualSnakeDirection = snakeDirection;
+                    }
+
+                    index++;
+                }
         }
 
         //reads message from client and sets the currentDirection of the clients Snake

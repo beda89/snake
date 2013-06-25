@@ -18,9 +18,10 @@ namespace Snake.FSM
             networkMenuClient = new NetworkMenuClient(menuPosition,this,mainMenuState);
         }
 
-        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             networkMenuClient.Update();
+            context.state = networkMenuClient.CurrentState;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
@@ -28,9 +29,5 @@ namespace Snake.FSM
             networkMenuClient.Draw(spriteBatch, gameGraphics);
         }
 
-        public StateBase getCurrentState()
-        {
-            return networkMenuClient.CurrentState;
-        }
     }
 }

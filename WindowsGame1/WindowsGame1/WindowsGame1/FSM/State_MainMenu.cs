@@ -19,20 +19,15 @@ namespace Snake.FSM
             mainMenu = new MainMenu(menuPosition,this);
         }
 
-        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             mainMenu.Update();
+            context.state = mainMenu.CurrentState;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
-
             mainMenu.Draw(spriteBatch, gameGraphics);
-        }
-
-        public StateBase getCurrentState()
-        {
-            return mainMenu.CurrentState;
         }
 
     }

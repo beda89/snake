@@ -27,11 +27,11 @@ namespace Snake.FSM
             this.currentState = this;
         }
 
-        public void Update(ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime)
+        public void Update(Context context,ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime)
         {
             if (!networkMenuServer.PortInput.CheckPortInput())
             {
-                currentState = oldState;
+                 context.state = oldState;
             }
             else
             {
@@ -40,18 +40,13 @@ namespace Snake.FSM
                 serverThread = new System.Threading.Thread(server.Start);
                 serverThread.Start();
 
-                currentState = new State_NetworkMenuServerWaiting(menuPosition, mainMenuState);
+                context.state = new State_NetworkMenuServerWaiting(menuPosition, mainMenuState);
             }
         }
 
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             //nothing to to here
-        }
-
-        public StateBase getCurrentState()
-        {
-            return currentState;
         }
     }
 }

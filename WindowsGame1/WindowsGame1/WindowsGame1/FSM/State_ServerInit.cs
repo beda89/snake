@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,8 +19,6 @@ namespace Snake.FSM
         private SnakeFood snakeFood;
         private Score score;
 
-        private StateBase currentState;
-
         private StateBase mainMenuState;
 
         public State_ServerInit(StateBase mainMenuState)
@@ -32,27 +31,20 @@ namespace Snake.FSM
 
             score = new Score();
 
-            currentState = this;
-
             this.mainMenuState = mainMenuState;
         }
 
 
-        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             initServerGame(server);
 
-            currentState = new State_ServerPlaying(snakeFood, snakes, gameField, score,mainMenuState);
+            context.state = new State_ServerPlaying(snakeFood, snakes, gameField, score,mainMenuState);
         }
 
         public void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             //nothing to do here
-        }
-
-        public StateBase getCurrentState()
-        {
-            return currentState;
         }
 
         private void initServerGame(Server server)
@@ -88,8 +80,15 @@ namespace Snake.FSM
             }
 
             //sending startsignals to all clients
-            server.sendStartSignal(snakes, snakeFood);
-        }
+            try
+            {
+                server.sendStartSignal(snakes, snakeFood);
+            }
+            catch (IOException)
+            {
+                //we don't care, next communication will also fail and than we disconnect
+            }
+       }
 
     }
 }

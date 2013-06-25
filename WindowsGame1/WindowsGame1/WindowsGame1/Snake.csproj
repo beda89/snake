@@ -90,7 +90,6 @@
     <Compile Include="Exceptions\MessageException.cs" />
     <Compile Include="FSM\Context.cs" />
     <Compile Include="FSM\StateBase.cs" />
-    <Compile Include="FSM\State_ClientInit.cs" />
     <Compile Include="FSM\State_ClientPlaying.cs" />
     <Compile Include="FSM\State_ConnectToServer.cs" />
     <Compile Include="FSM\State_Disconnect.cs" />

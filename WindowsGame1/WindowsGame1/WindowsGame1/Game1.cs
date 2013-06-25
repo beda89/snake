@@ -50,24 +50,24 @@ namespace Snake
 
         void Game1_Exiting(object sender, EventArgs e)
         {
-            if (serverThread != null)
-            {
-                serverThread.Abort();
-            }
-
             if (server != null)
             {
                 server.Stop();
             }
 
-            if (clientThread != null)
+            if (serverThread != null)
             {
-                clientThread.Abort();
+                serverThread.Abort();
             }
 
             if (client != null)
             {
                 client.Stop();
+            }
+
+            if (clientThread != null)
+            {
+                clientThread.Abort();
             }
 
         }

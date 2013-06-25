@@ -16,48 +16,37 @@ namespace Snake.FSM
         private StateBase currentState;
         private StateBase mainMenuState;
 
-        public State_NetworkMenuClientWaiting(Vector2 menuPosition,StateBase networkMenuState,StateBase mainMenuState)
+        public State_NetworkMenuClientWaiting(Vector2 menuPosition,StateBase mainMenuState)
         {
-            networkMenuClientWaiting = new NetworkMenuClientWaiting(menuPosition,this,mainMenuState,networkMenuState);
+            networkMenuClientWaiting = new NetworkMenuClientWaiting(menuPosition,this,mainMenuState);
 
             currentState = this;
             this.mainMenuState = mainMenuState;
         }
 
-        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             networkMenuClientWaiting.Update();
 
             if (client.ClientGameState == ClientState.DISCONNECT)
             {
-                currentState = mainMenuState;
+                context.state = new State_Disconnect(mainMenuState);
             }
             else if (client.ClientGameState == ClientState.PLAYING)
             {
-                currentState = new State_ClientPlaying(mainMenuState);
+                context.state = new State_ClientPlaying(mainMenuState);
             }
 
-
+            StateBase temp= networkMenuClientWaiting.CurrentState;
+            if (temp is State_Disconnect)
+            {
+                context.state = temp;
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             networkMenuClientWaiting.Draw(spriteBatch, gameGraphics);
-
-        }
-
-        public StateBase getCurrentState()
-        {
-            if (networkMenuClientWaiting.CurrentState is MainMenu)
-            {
-                return networkMenuClientWaiting.CurrentState;
-            }
-            else
-            {
-                return currentState;
-
-            }
-
         }
     }
 }

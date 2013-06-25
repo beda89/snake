@@ -10,10 +10,8 @@ namespace Snake.FSM
 {
     interface StateBase
     {
-        void Update(ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime);
+        void Update(Context context,ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime);
 
         void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics);
-
-        StateBase getCurrentState();
     }
 }

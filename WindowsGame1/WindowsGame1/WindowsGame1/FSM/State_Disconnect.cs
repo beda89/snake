@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Snake.FSM
 {
     class State_Disconnect:StateBase
     {
-        private StateBase currentState;
         private StateBase mainMenu;
 
         public State_Disconnect(StateBase mainMenu)
@@ -17,7 +17,7 @@ namespace Snake.FSM
             this.mainMenu = mainMenu;
         }
 
-        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             if(server!=null){
                 server.Stop();
@@ -43,18 +43,13 @@ namespace Snake.FSM
             client=null;
             clientThread=null;
 
-            currentState = mainMenu;
+            context.state = mainMenu;
 
         }
 
-        public void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, GameGraphics gameGraphics)
+        public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             //nothing to do here
-        }
-
-        public StateBase getCurrentState()
-        {
-            return currentState;
         }
     }
 }

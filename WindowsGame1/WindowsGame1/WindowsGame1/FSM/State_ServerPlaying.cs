@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -26,7 +27,6 @@ namespace Snake.FSM
         private GameField gameField;
         private Score score;
 
-        private StateBase currentState;
         private StateBase mainMenuState;
 
         private KeyboardState currentKeyboardState;
@@ -40,12 +40,11 @@ namespace Snake.FSM
             this.gameField = gameField;
             this.score = score;
             this.mainMenuState = mainMenuState;
-            currentState = this;
         }
 
-        public void Update(ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime)
+        public void Update(Context context,ref Server server,ref Thread serverThread,ref Client client,ref Thread clientThread,GameTime gameTime)
         {
-            inPlay(gameTime,server);
+            inPlay(context,gameTime,server);
 
             currentKeyboardState = Keyboard.GetState();
         }
@@ -53,11 +52,6 @@ namespace Snake.FSM
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             drawPlayingGame(spriteBatch, gameGraphics);
-        }
-
-        public StateBase getCurrentState()
-        {
-            return currentState;
         }
 
         private void drawPlayingGame(SpriteBatch spriteBatch, GameGraphics gameGraphics)
@@ -89,8 +83,7 @@ namespace Snake.FSM
             }
         }
 
-        //only called by the server
-        private void inPlay(GameTime gameTime,Server server)
+        private void inPlay(Context context,GameTime gameTime,Server server)
         {
             // Update the elapsed time
             elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -104,31 +97,35 @@ namespace Snake.FSM
                 }
                 catch (MessageException)
                 {
-                    //gameState=GameState.DISCONNECT_SERVER;
-
+                    context.state = new State_Disconnect(mainMenuState);
+                    return;
+                }
+                catch (IOException)
+                {
+                    context.state = new State_Disconnect(mainMenuState);
                     return;
                 }
 
                 //snakes are moved once during frameTime
-                updateSnakes(snakes, true);
-                gameLogic(snakes,server);
+                updateSnakes(context,snakes, true);
+                gameLogic(context,snakes,server);
 
                 elapsedTime = 0;
             }
             else
             {
-                updateSnakes(snakes, false);
+                updateSnakes(context,snakes, false);
 
             }
         }
 
 
-        /*
+   /*
    * contains the whole gamelogic
    * it is all done by the server
    * 
    */
-        private void gameLogic(List<Snake> snakes,Server server)
+        private void gameLogic(Context context,List<Snake> snakes,Server server)
         {
             moveCounter++;
 
@@ -155,7 +152,7 @@ namespace Snake.FSM
                 snake.CheckIfEatenByEnemy(snakes);
             }
 
-            checkIfGameFinished(snakes,server);
+            checkIfGameFinished(context,snakes,server);
 
         }
 
@@ -172,8 +169,7 @@ namespace Snake.FSM
             }
         }
 
-
-        private void updateSnakes(List<Snake> snakes, Boolean moveSnakes)
+        private void updateSnakes(Context context,List<Snake> snakes, Boolean moveSnakes)
         {
             int index = 0;
             //server snake is always the first one
@@ -186,7 +182,7 @@ namespace Snake.FSM
 
                 if (index == 0)
                 {
-                    setDirection(snake);
+                    setDirection(context,snake);
                 }
 
                 if (moveSnakes == true)
@@ -209,7 +205,7 @@ namespace Snake.FSM
 
         }
         
-        private void setDirection(Snake snake){
+        private void setDirection(Context context,Snake snake){
              Snake.Direction tempDirection;
 
             if (currentKeyboardState.IsKeyDown(Keys.Left))
@@ -230,7 +226,7 @@ namespace Snake.FSM
             }
             else if (currentKeyboardState.IsKeyDown(Keys.Escape))
             {
-                currentState = new State_Disconnect(mainMenuState);
+                context.state = new State_Disconnect(mainMenuState);
 
                 return ; 
             }else
@@ -245,8 +241,7 @@ namespace Snake.FSM
 
         } 
 
-        
-        private void checkIfGameFinished(List<Snake> snakes,Server server)
+        private void checkIfGameFinished(Context context,List<Snake> snakes,Server server)
         {
             int index = 0;
             int winner = 0;
@@ -267,7 +262,7 @@ namespace Snake.FSM
             {
                  server.sendEndSignal(winner);
 
-                 currentState = new State_Disconnect(mainMenuState);
+                 context.state = new State_Disconnect(mainMenuState);
             }
         } 
 

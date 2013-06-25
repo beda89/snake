@@ -18,19 +18,15 @@ namespace Snake.FSM
             networkMenuServer = new NetworkMenuServer(menuPosition,this,mainMenuState);
         }
 
-        public void Update(ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
             networkMenuServer.Update();
+            context.state = networkMenuServer.CurrentState;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             networkMenuServer.Draw(spriteBatch, gameGraphics);
-        }
-
-        public StateBase getCurrentState()
-        {
-            return networkMenuServer.CurrentState;
         }
     }
 }

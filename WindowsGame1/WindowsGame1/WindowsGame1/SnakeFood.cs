@@ -16,8 +16,8 @@ namespace Snake
 
         public void Initialize(int topGameFieldBound)
         {
-            this.gameFieldWidth = 512;
-            this.gameFieldHeight = 512;
+            this.gameFieldWidth = 800;
+            this.gameFieldHeight = 480;
             this.topGameFieldBound = topGameFieldBound;
 
             Position = generateNewPosition();

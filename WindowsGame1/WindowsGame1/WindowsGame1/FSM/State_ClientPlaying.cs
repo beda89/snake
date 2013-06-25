@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -18,47 +19,41 @@ namespace Snake.FSM
         private GameField gameField;
         private Score score;
         private KeyboardState currentKeyboardState;
-        private StateBase currentState;
-        private StateBase mainMenu;
+        private StateBase mainMenuState;
+        private int clientSnakeNumber = 1;
 
-        public State_ClientPlaying(StateBase mainMenu)
+        public State_ClientPlaying(StateBase mainMenuState)
         {
-            this.mainMenu = mainMenu;
+            this.mainMenuState = mainMenuState;
 
             snakeFood = new SnakeFood();
             gameField = new GameField();
             gameField.Initialize(TOPBOUND_Y);
 
             score = new Score();
-
-            currentState = this;
         }
 
 
-        public void Update(ref Server server, ref System.Threading.Thread serverThread, ref Client client, ref System.Threading.Thread clientThread, GameTime gameTime)
+        public void Update(Context context,ref Server server, ref Thread serverThread, ref Client client, ref Thread clientThread, GameTime gameTime)
         {
+            clientSnakeNumber = client.SnakeNumber;
             snakes = client.Snakes;
             snakeFood.Position = client.SnakeFoodPosition;
           
             currentKeyboardState = Keyboard.GetState();
 
-            updateSnakes(snakes, client);
+            updateSnakes(context,snakes, client);
 
             if (client.ClientGameState == ClientState.DISCONNECT)
             {
-                currentState = new State_Disconnect(mainMenu);
+                context.state = new State_Disconnect(mainMenuState);
             }
 
         }
 
-        public void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, GameGraphics gameGraphics)
+        public void Draw(SpriteBatch spriteBatch, GameGraphics gameGraphics)
         {
             drawPlayingGame(spriteBatch, gameGraphics);
-        }
-
-        public StateBase getCurrentState()
-        {
-           return currentState;
         }
 
         private void drawPlayingGame(SpriteBatch spriteBatch, GameGraphics gameGraphics)
@@ -75,6 +70,7 @@ namespace Snake.FSM
                 {
                     if (snake.IsGameOver)
                     {
+                        index++;
                         continue;
                     }
 
@@ -85,25 +81,25 @@ namespace Snake.FSM
                 gameField.Draw(spriteBatch, gameGraphics);
 
                 //server is always snakeNumber 0
-                score.Draw(spriteBatch, gameGraphics, snakes, 0);
+                score.Draw(spriteBatch, gameGraphics, snakes, clientSnakeNumber );
             }
         }
 
 
 
-          private void updateSnakes(List<Snake> snakes,Client client)
+          private void updateSnakes(Context context,List<Snake> snakes,Client client)
           {
             //the only logic a client has, is that he sets the current direction of its snake according to the user input
                 if (snakes.Count() > 0)
                 {
                     Snake clientSnake = snakes.ElementAt(client.SnakeNumber);
-                    setDirection(clientSnake);
+                    setDirection(context,clientSnake);
                     client.ClientSnakeDirection = clientSnake.ChoosenSnakeDirection;
                 }
         }
 
 
-        private void setDirection(Snake snake){
+        private void setDirection(Context context,Snake snake){
              Snake.Direction tempDirection;
 
             if (currentKeyboardState.IsKeyDown(Keys.Left))
@@ -124,7 +120,7 @@ namespace Snake.FSM
             }
             else if (currentKeyboardState.IsKeyDown(Keys.Escape))
             {
-                //TODO disconnect
+                context.state = new State_Disconnect(mainMenuState);
                 return ; 
             }else
             {

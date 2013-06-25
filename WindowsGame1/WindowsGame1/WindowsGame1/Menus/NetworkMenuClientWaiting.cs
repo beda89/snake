@@ -12,7 +12,7 @@ namespace Snake.Menus
     class NetworkMenuClientWaiting:Menu
     {
         
-        public NetworkMenuClientWaiting(Vector2 startPosition,StateBase standardState,StateBase mainMenuState,StateBase networkClientMenuState)
+        public NetworkMenuClientWaiting(Vector2 startPosition,StateBase standardState,StateBase mainMenuState)
             : base(startPosition, standardState)
         {
             items.Add(new MenuEntry("Cancel", Color.Black, Color.Green, new Rectangle((int)startPosition.X, (int)startPosition.Y + (ITEM_HEIGHT + ITEM_SPACING_Y), ITEM_WIDTH, ITEM_HEIGHT), new State_Disconnect(mainMenuState)));
